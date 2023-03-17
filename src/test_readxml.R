@@ -18,27 +18,27 @@ a
 
 # rowclass check function 
 # res <- res 
-df <- res
-# %>% angle_check() 
+df <- res %>% angle_check() 
 clas <- classfun(df$robndbox.cy) 
-df <- df %>% mutate(rowclass=clas)
+df <- df %>% mutate(rowclass=clas,
+                    display.y=height-robndbox.cy)
 
 # visualization-------------------------------------------------------------------------
 df %>% 
   # mutate( rowclass=clas%>% as.factor()) %>%
-  ggplot(aes(robndbox.cx,robndbox.cy,color=rowclass ))+geom_point()+
+  ggplot(aes(robndbox.cx,display.y,color=rowclass ))+geom_point()+
   theme_bw()+ggtitle(paste("a",k))
 
 # check intermediate
 res %>% 
   mutate( rowclass=clas%>% as.factor()) %>%
-  ggplot(aes(robndbox.cx,robndbox.cy,color=rowclass ))+geom_point()+
+  ggplot(aes(robndbox.cx,display.y,color=rowclass ))+geom_point()+
   theme_bw()+ggtitle(paste("a",k))
-  
-k <- 23
- f <- xmlread(paste0('data/detected pictures/',flist[k]))
- f2 <- xmlread2(paste0('data/detected pictures/',flist[k]))
- p <-f%>% 
+
+k <- 9
+f <- xmlread(paste0('data/detected pictures/',flist[k]))
+f2 <- xmlread2(paste0('data/detected pictures/',flist[k]))
+p <-f%>% 
   ggplot(aes(robndbox.cx,display.y,color=rowclass))+
   geom_point()+
   theme_bw()+ggtitle(paste("a",k))+

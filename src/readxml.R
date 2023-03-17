@@ -12,16 +12,26 @@ classfun <-function(vec){
   cut(vec,length(which(hist.res$counts>0))) %>% as.numeric()
 } 
 # rotation should not be based on the labeled data, but the slope
-rad2deg <- function(rad){
-  (180-((rad * 180) / (pi)))*-1
+# rad2deg <- function(rad){
+#   deg <- rad * 180 / pi
+#   if(deg>90){
+#     deg <- deg-180
+#   }
+#   return(deg)
+# }
+rad2trans <- function(rad){
+  if(rad>(pi/2)){
+    rad <- pi-rad
+  }
+  return(rad)
 }
 angle_check<- function(df){
   if(any(df$robndbox.angle>0)){
     rad <- df$robndbox.angle
-    rad <- rad %>% median() #[!ang==0]
+    rad <- rad   %>% .[.>0]%>% median()
     newxy<- df%>% 
       select(robndbox.cx,robndbox.cy) %>%
-      xyrotate(.,rad2deg(rad))
+      xyrotate(.,rad2trans(rad))
     df$robndbox.cx <- newxy$robndbox.cx
     df$robndbox.cy <- newxy$robndbox.cy
   }
@@ -69,12 +79,13 @@ row_check <- function(df){
         # check the nearest class is within the range of threshold
         if(distdf$s<100){
           new.class <- distdf%>% .$rowclass
+          df <- df %>%
+            mutate(rowclass=case_when(robndbox.cy%in%out.y~new.class,
+                                      T~rowclass) )
         } else{
           warning(paste("canot reclass based on sd.thresh",sd.thresh))
         }
-        df <- df %>%
-          mutate(rowclass=case_when(robndbox.cy%in%out.y~new.class,
-                                    T~rowclass) )
+
       }else if( ckdf[i,]$"s"<100){
         # in case of just need to reclassify into two classes
         # give a new class that will not overlap with other situation
@@ -104,12 +115,15 @@ row_check <- function(df){
               m2=median(robndbox.cy),
               m=median(robndbox.cy)) %>%
     arrange(m) 
-  ind <- which(diff(sumdf2$m)<20)
+  ind <- which(diff(sumdf2$m)<50)
   for ( j in ind){
     class.vec <- sumdf2[c(j,j+1),]$rowclass
-    df <- df %>%
+    df2 <- df %>%
       mutate(rowclass=case_when(rowclass%in%class.vec~class.vec[1],
                                 T~rowclass) )
+    if(sd(df2[df2$rowclass==class.vec[1]]$robndbox.cy)<min(df$robndbox.h)*1.5){
+      df <- df2
+    }
   }
   return(df)
 }
@@ -122,15 +136,14 @@ xmlread<- function(filename){
     mutate(across(robndbox.cx:robndbox.angle,as.numeric),
            pic=tmp$filename,
            width=tmp$size %>% .$width,
-           height=tmp$size %>% .$height %>% as.numeric())
-  # %>% 
-    # angle_check(.)
+           height=tmp$size %>% .$height %>% as.numeric())%>%
+    angle_check(.)
   clas <- classfun(res$robndbox.cy) 
   # rowclass check function 
   res <- res %>% 
     mutate(rowclass=clas) %>% 
     row_check(.) %>%
-    row_check(.) %>%
+    # row_check(.) %>%
     group_by(rowclass) %>%
     mutate(rowclass=mean(robndbox.cy)) %>% 
     ungroup() %>% 
