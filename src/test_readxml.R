@@ -1,15 +1,14 @@
-k <- 26
-filename <- paste0('data/detected pictures/',flist[k])
+k <- 3
+filename <- paste0('/',flist[k])
 # read xml file and turn to dataframe
 tmp <- XML::xmlToList(filename) 
 res <- tmp%>% 
   .[grepl("object",names(.))] %>% 
   purrr::map_dfr(.,~{data.frame(t(unlist(.x)))}) %>% 
   mutate(across(robndbox.cx:robndbox.angle,as.numeric),
-         
          pic=tmp$filename,
          width=tmp$size %>% .$width,
-         height=tmp$size %>% .$height,
+         height=tmp$size %>% .$height %>% as.numeric(),
          display.y=as.numeric(height)-robndbox.cy)
 # res <- res %>% angle_check()
 a <- df$robndbox.angle %>% mean()
@@ -35,9 +34,9 @@ res %>%
   ggplot(aes(robndbox.cx,display.y,color=rowclass ))+geom_point()+
   theme_bw()+ggtitle(paste("a",k))
 
-k <- 9
-f <- xmlread(paste0('data/detected pictures/',flist[k]))
-f2 <- xmlread2(paste0('data/detected pictures/',flist[k]))
+# k <- 29
+f <- xmlread(paste0(path,'/',flist[k]))
+f2 <- xmlread2(paste0(path,'/',flist[k]))
 p <-f%>% 
   ggplot(aes(robndbox.cx,display.y,color=rowclass))+
   geom_point()+
