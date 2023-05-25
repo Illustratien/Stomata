@@ -5,8 +5,8 @@ docs
 inst/doc
 man_backup
 Meta
-/doc/
-/Meta/
-data/
+doc
+Meta
+data
 result
 src/test
