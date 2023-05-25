@@ -7,5 +7,6 @@ man_backup
 Meta
 /doc/
 /Meta/
-data
+data/
 result
+src/test
