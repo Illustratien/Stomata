@@ -95,7 +95,7 @@ for (folder in folders){
     group_by(pic_name) %>% 
     group_split()
   
-  pdf(paste0("result/",folder,"/stomata_position_check.pdf"),onefile = T)
+  pdf(paste0("result/",folder,"/",folder,"_stomata_position_check.pdf"),onefile = T)
   
   system.time(
     p_df<- foreach(
