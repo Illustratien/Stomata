@@ -3,8 +3,8 @@ source("src/modules/set_up.R")
 # project folder structure-------------------------------------------------------------------------
 # put folders contains only .xml under "data"
 # each folder is one batch of experiment
-dir.create(file.path("./data"), showWarnings = FALSE)
-dir.create(file.path("./result"), showWarnings = FALSE)
+dir.create(file.path("../data"), showWarnings = FALSE)
+dir.create(file.path("../result"), showWarnings = FALSE)
 
 # read files-------------------------------------------------------------------------
 # read xml, calculate row class,
