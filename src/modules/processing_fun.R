@@ -35,7 +35,7 @@ plot_fun <- function(df){
     scale_y_continuous("y",limits = c(0,df[["pic_height"]][1]))+
     ggforce::geom_ellipse(data=df %>% filter(!grepl("incomplete",stomata.type)),
                           mapping=aes(x0 = stomata.cx, y0 = display.y,
-                                      a = stomata.w/2, b = stomata.h/2, 
+                                      a = stomata.length/2, b = stomata.width/2, 
                                       angle = stomata.angle %>% map_dbl(.,~{
                                         rad2trans(.x)})),
                           show.legend =F)+
@@ -63,26 +63,33 @@ Disperse_1D<- function(gdf,tar,row=NULL){
   if (is.null(row)){
     row=tar
   }
+  if(tar=="row_dist"){
+    fun_list <- list(min=min,
+                     max=max,
+                     mean=mean,
+                     median=median,
+                     sd=sd)
+  }else if (tar=="stomata.cx"){
+    fun_list<- list(min=min,
+                    max=max,
+                    mean=mean,
+                    median=median,
+                    sd=sd,
+                    # interquartile range tells you the spread of the middle half of your distribution
+                    iqr=IQR,
+                    # zero means just like normal distribution, symmetric
+                    # positive means right tail
+                    # negative means left tail
+                    skewness=moments::skewness,
+                    # less or more peak than the normal distribution
+                    # usually, more than 3 means more peak
+                    # usually, less than 3 means flat
+                    kurtosis=moments::kurtosis)
+  }
   # wrapper
   gdf %>%
     dplyr::summarise(across({{tar}},
-                            list(min=min,
-                                 max=max,
-                                 mean=mean,
-                                 median=median,
-                                 count=length,
-                                 var=var,
-                                 sd=sd,
-                                 # interquartile range tells you the spread of the middle half of your distribution
-                                 iqr=IQR,
-                                 # zero means just like normal distribution, symmetric
-                                 # positive means right tail
-                                 # negative means left tail
-                                  skewness=moments::skewness,
-                                 # less or more peak than the normal distribution
-                                 # usually, more than 3 means more peak
-                                 # usually, less than 3 means flat
-                                 kurtosis=moments::kurtosis),
+                            fun_list,
                             .names = paste0(row,"_{.fn}")))
 }
 
@@ -97,7 +104,7 @@ complete_count <- function(df){
   df %>% 
     dplyr::filter(grepl("^complete$",stomata.type)) %>% 
     group_by(!!!g) %>% 
-    dplyr::summarise(across(stomata.w:stomata.h,list(mean=mean,sd=sd)),
+    dplyr::summarise(across(c(stomata.length,stomata.width),list(mean=mean,sd=sd)),
                      stomata.complete_count=n())
   # %>% 
   # tidyr::pivot_longer(-c(!!!g),names_to = 'trait',values_to = 'Trait')
@@ -106,7 +113,7 @@ complete_count <- function(df){
 row_dispersion <- function(df){
   # for each row, calculate the dispersion of points
   df %>% 
-    dplyr::filter(stomata.row.count>1) %>% 
+    dplyr::filter(stomata.per.row>1) %>% 
     group_by(pic_name,stomata.row) %>% 
     Disperse_1D(.,"stomata.cx","row")
   
@@ -118,8 +125,9 @@ weight_statistic <- function(df){
   df %>% 
     group_by(pic_name) %>% 
     mutate(stomata.Nr.weight=case_when(grepl("\\b\\.?complete\\b",stomata.type)~1,
+                                       grepl("hair",stomata.type)~0,
                                        T~.5),
-           area=pi*(stomata.w/2)*(stomata.h/2),
+           area=pi*(stomata.length/2)*(stomata.width/2),
            pic_area=(pic_width*pic_height)
     ) %>% 
     summarise(effective.stomatal.count=sum(stomata.Nr.weight),

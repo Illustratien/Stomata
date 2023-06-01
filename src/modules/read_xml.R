@@ -38,12 +38,16 @@ for (folder in folders){
                     stomata.row=rowclass) %>%
       dplyr::relocate(stomata.row) %>%
       group_by(pic_name,stomata.row) %>%
-      mutate(stomata.row.count=n())
+      mutate(stomata.per.row=n())
   )
   
   names(format_res) <-
     names(format_res) %>%
     gsub("robndbox","stomata",.)
+  format_res<- format_res %>%
+    rename(stomata.length=stomata.w,stomata.width=stomata.h)
+  
+  
   raw_name <- paste0("result/intermediate/",folder,"/",folder,"_xml_data.csv")
   write.csv(format_res,
             raw_name,
@@ -54,7 +58,7 @@ for (folder in folders){
   format_res <- read.csv(raw_name)%>% 
     mutate(stomata.row=factor(stomata.row))
   res_ls<- format_res %>% 
-    dplyr::filter(stomata.row.count>1) %>% 
+    dplyr::filter(stomata.per.row>1) %>% 
     droplevels() %>% 
     group_by(pic_name,stomata.row) %>% 
     group_split() 
@@ -70,7 +74,7 @@ for (folder in folders){
           display.y ~ stomata.cx , data = .)))%>%
         unnest(cols = c(mod)) 
       sub_df <- df %>% 
-        select(pic_name,stomata.row,stomata.row.count) %>% 
+        select(pic_name,stomata.row,stomata.per.row) %>% 
         .[1,] 
       
       df <- cbind(sub_df[rep(1,nrow(sloptable)),],

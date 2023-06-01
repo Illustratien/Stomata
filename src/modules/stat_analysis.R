@@ -74,9 +74,9 @@ for (folder in folders){
       map_dfr(.,~{.x})
   )
   
-  rowdist_disperse <- rowdist_df %>% 
-    group_by(pic_name) %>% 
-    Disperse_1D(.,"row_dist") %>% 
+  rowdist_disperse <- rowdist_df %>%
+    group_by(pic_name) %>%
+    Disperse_1D(.,"row_dist") %>%
     left_join(rowdist_df,.,"pic_name")
   
   write.csv(rowdist_disperse,
