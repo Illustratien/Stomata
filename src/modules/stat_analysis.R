@@ -17,9 +17,9 @@ for (folder in folders){
   pb = txtProgressBar(min = 0, max = 2,
                       style = 3,    # Progress bar style (also available style = 1 and style = 2)
                       width = 30,initial = 0)
-  format_res <- read.csv(paste0("result/",folder,"/",folder,"_xml_data.csv"))%>% 
+  format_res <- read.csv(paste0("result/intermediate/",folder,"/",folder,"_xml_data.csv"))%>% 
     mutate(stomata.row=factor(stomata.row))
-  slope_df <-  read.csv(paste0("result/",folder,"/",folder,"_slope.csv"))
+  slope_df <-  read.csv(paste0("result/intermediate/",folder,"/",folder,"_slope.csv"))
   # easy summary of raw data-------------------------------------------------------------------------
   # area cover 1*complete, .5*incomplete
   # total number 1*complete, .5*incomplete
@@ -42,7 +42,7 @@ for (folder in folders){
   doParallel::stopImplicitCluster()
   
   write.csv(stat_df,
-            paste0("result/",folder,"/",folder,"_stomata_stat.csv"),
+            paste0("result/intermediate/",folder,"/",folder,"_stomata_stat.csv"),
             row.names = F)
   setTxtProgressBar(pb,1)
   # slope check -------------------------------------------------------------------------
@@ -76,11 +76,11 @@ for (folder in folders){
   
   rowdist_disperse <- rowdist_df %>% 
     group_by(pic_name) %>% 
-    Disperse_1D(.,"row_dist") %>% 
+    Disperse_1D(.,"pic_name") %>% 
     left_join(rowdist_df,.,"pic_name")
   
   write.csv(rowdist_disperse,
-            paste0("result/",folder,"/",folder,"_rowdist_dispersion.csv"),
+            paste0("result/intermediate/",folder,"/",folder,"_rowdist_dispersion.csv"),
             row.names = F)
   setTxtProgressBar(pb,2)
 }

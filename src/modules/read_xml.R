@@ -19,7 +19,7 @@ for (folder in folders){
   pb = txtProgressBar(min = 0, max = 3,
                       style = 3,    # Progress bar style (also available style = 1 and style = 2)
                       width = 30,initial = 0)
-  dir.create(file.path("./result",folder), showWarnings = FALSE)
+  dir.create(file.path("./result/intermediate/",folder), showWarnings = FALSE)
   # read raw data -----------------------------------------------------------
   flist <- list.files(paste0("data/",folder,"/"),".xml")
   
@@ -44,7 +44,7 @@ for (folder in folders){
   names(format_res) <-
     names(format_res) %>%
     gsub("robndbox","stomata",.)
-  raw_name <- paste0("result/",folder,"/",folder,"_xml_data.csv")
+  raw_name <- paste0("result/intermediate/",folder,"/",folder,"_xml_data.csv")
   write.csv(format_res,
             raw_name,
             row.names = F  )
@@ -86,7 +86,7 @@ for (folder in folders){
   
   
   
-  slop_name <- paste0("result/",folder,"/",folder,"_slope.csv")
+  slop_name <- paste0("result/intermediate/",folder,"/",folder,"_slope.csv")
   write.csv(slope_df,slop_name,row.names = F)
   setTxtProgressBar(pb,2)
   # export pdf -------------------------------------------------------------------------
@@ -95,7 +95,7 @@ for (folder in folders){
     group_by(pic_name) %>% 
     group_split()
   
-  pdf(paste0("result/",folder,"/",folder,"_stomata_position_check.pdf"),onefile = T)
+  pdf(paste0("result/intermediate/",folder,"/",folder,"_stomata_position_check.pdf"),onefile = T)
   
   system.time(
     p_df<- foreach(

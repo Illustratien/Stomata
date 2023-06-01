@@ -68,12 +68,21 @@ Disperse_1D<- function(gdf,tar,row=NULL){
     dplyr::summarise(across({{tar}},
                             list(min=min,
                                  max=max,
+                                 mean=mean,
+                                 median=median,
                                  count=length,
                                  var=var,
                                  sd=sd,
+                                 # interquartile range tells you the spread of the middle half of your distribution
                                  iqr=IQR,
-                                 skewness=moments::skewness,
-                                 kurtosis=e1071::kurtosis),
+                                 # zero means just like normal distribution, symmetric
+                                 # positive means right tail
+                                 # negative means left tail
+                                  skewness=moments::skewness,
+                                 # less or more peak than the normal distribution
+                                 # usually, more than 3 means more peak
+                                 # usually, less than 3 means flat
+                                 kurtosis=moments::kurtosis),
                             .names = paste0(row,"_{.fn}")))
 }
 
@@ -86,7 +95,7 @@ complete_count <- function(df){
   # should only the complete be considered?
   # dplyr::filter(stomata_type=='complete') %>% 
   df %>% 
-    dplyr::filter(grepl("\\b\\.?complete\\b",stomata.type)) %>% 
+    dplyr::filter(grepl("^complete$",stomata.type)) %>% 
     group_by(!!!g) %>% 
     dplyr::summarise(across(stomata.w:stomata.h,list(mean=mean,sd=sd)),
                      stomata.complete_count=n())
