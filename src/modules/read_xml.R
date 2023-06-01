@@ -11,7 +11,7 @@ my.cluster <- parallel::makeCluster(
 doParallel::registerDoParallel(cl = my.cluster)
 # raw data preparation-------------------------------------------------------------------------
 folders <-list.dirs("data",recursive = F) %>% gsub("data/","",.)
-
+dir.create(file.path("./result/intermediate"), showWarnings = FALSE)
 
 for (folder in folders){
   message(folder)

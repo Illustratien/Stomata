@@ -19,3 +19,9 @@ system.time(
   source("src/modules/stat_analysis.R")
 )
 
+
+# picture wise -------------------------------------------------------------------------
+system.time(
+  source("src/modules/summarize_and_merge.R")
+)
+

@@ -1,6 +1,6 @@
 pkg.list <- 
   c("XML","purrr", "ggforce",   
-    "dplyr", "moments","e1071",   
+    "dplyr", "moments",   
     "rlang" ,"tidyr", "pacman" ,   
     "parallel","doParallel","broom")
 local.pkg <- installed.packages()[,"Package"]
