@@ -28,8 +28,11 @@ iwalk(folders,function(folder,i){
               across(slope,
                      list(mean=mean,sd=sd),.names=paste0("row_","{.col}_{.fn}")
               ))
-  res <- list(raw,stat,slope,rowdis,row_stat) %>%
+  route_df <- read.csv(paste0("result/intermediate/",folder,"/",folder,"_route.csv"))
+  
+  res <- list(raw,stat,slope,rowdis,row_stat,route_df) %>%
     Reduce(function(x, y) left_join(x, y, by = "pic_name"), .)
+  
   write.csv(res,
             paste0("result/",folder,"_summary.csv"),row.names = F)
   setTxtProgressBar(pb,i)
