@@ -95,7 +95,9 @@ for (folder in folders){
   setTxtProgressBar(pb,2)
   # export pdf -------------------------------------------------------------------------
   pic_name <- format_res$pic_name %>% unique()
-  pic_ls <- format_res %>% 
+  
+  pic_ls <- read.csv(raw_name)%>% 
+    mutate(stomata.row=factor(stomata.row)) %>% 
     group_by(pic_name) %>% 
     group_split()
   
