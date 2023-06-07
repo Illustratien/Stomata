@@ -1,7 +1,6 @@
 pacman::p_load(dplyr,ggplot2,broom,purrr,tidyr,foreach)
 # -------------------------------------------------------------------------
 source("src/modules/processing_fun.R")
-source("src/modules/2d_descriptor.R")
 # parallel setting
 n.cores <- parallel::detectCores() - 1
 #create the cluster
