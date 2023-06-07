@@ -15,7 +15,7 @@ folders <-list.dirs("data",recursive = F) %>% gsub("data/","",.)
 for (folder in folders){
   message(folder)
   message("statistics for stomata geometry and row_distance:")
-  pb = txtProgressBar(min = 0, max = 3,
+  pb = txtProgressBar(min = 0, max = 2,
                       style = 3,    # Progress bar style (also available style = 1 and style = 2)
                       width = 30,initial = 0)
   format_res <- read.csv(paste0("result/intermediate/",folder,"/",folder,"_xml_data.csv"))%>% 
@@ -86,20 +86,20 @@ for (folder in folders){
   setTxtProgressBar(pb,2)
 
 # top salesman route -------------------------------------------------------------------------
-  system.time(
-    topsalesman_df <- foreach(
-      sub_df = df_ls,
-      .packages = c('dplyr','ompr','ompr.roi','ROI.plugin.glpk')
-    ) %dopar% {
-      source("src/modules/2d_descriptor.R")
-      sub_df %>% optim_d()
-    } %>% 
-      map_dfr(.,~{.x})
-  )
-  write.csv(topsalesman_df,
-            paste0("result/intermediate/",folder,"/",folder,"_route.csv"),
-            row.names = F)
-  setTxtProgressBar(pb,3)
+  # system.time(
+  #   topsalesman_df <- foreach(
+  #     sub_df = df_ls,
+  #     .packages = c('dplyr','ompr','ompr.roi','ROI.plugin.glpk')
+  #   ) %dopar% {
+  #     source("src/modules/2d_descriptor.R")
+  #     sub_df %>% optim_d()
+  #   } %>% 
+  #     map_dfr(.,~{.x})
+  # )
+  # write.csv(topsalesman_df,
+  #           paste0("result/intermediate/",folder,"/",folder,"_route.csv"),
+  #           row.names = F)
+  # setTxtProgressBar(pb,3)
   
   doParallel::stopImplicitCluster()
 }
