@@ -15,13 +15,17 @@ xmlread <- function(filename,thr){
 
 add_row_class <- function(df,thr){
   # chat GPT
-  dist_matrix <- dist(df$robndbox.cy)
+  normal_df <- df %>% filter(!name=='hair')
+  
+  dist_matrix <- dist(normal_df$robndbox.cy)
   # Apply hierarchical clustering to the distance matrix
   hc <- hclust(dist_matrix)
   # Cut the dendrogram at a suitable height to obtain clusters
   # The 'h' parameter determines the height at which to cut the dendrogram
-  df %>% 
-    mutate(rowclass=cutree(hc, h = thr) %>% factor())
+  normal_df %>% 
+    mutate(rowclass=cutree(hc, h = thr) %>% factor()) %>% 
+    select(robndbox.cx,robndbox.cy,rowclass) %>% 
+    left_join(df,.)
   
 }
 

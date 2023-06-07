@@ -19,7 +19,9 @@ for (folder in folders){
                       style = 3,    # Progress bar style (also available style = 1 and style = 2)
                       width = 30,initial = 0)
   format_res <- read.csv(paste0("result/intermediate/",folder,"/",folder,"_xml_data.csv"))%>% 
-    mutate(stomata.row=factor(stomata.row))
+    mutate(stomata.row=factor(stomata.row))%>% 
+    dplyr::filter(!stomata.type=='hair')
+  
   slope_df <-  read.csv(paste0("result/intermediate/",folder,"/",folder,"_slope.csv"))
   # easy summary of raw data-------------------------------------------------------------------------
   # area cover 1*complete, .5*incomplete
@@ -39,8 +41,6 @@ for (folder in folders){
     } %>% 
       map_dfr(.,~{.x})
   )
-  
-
   
   write.csv(stat_df,
             paste0("result/intermediate/",folder,"/",folder,"_stomata_stat.csv"),

@@ -56,7 +56,9 @@ for (folder in folders){
   # slope -------------------------------------------------------------------
   
   format_res <- read.csv(raw_name)%>% 
-    mutate(stomata.row=factor(stomata.row))
+    mutate(stomata.row=factor(stomata.row)) %>% 
+    dplyr::filter(!stomata.type=='hair')
+  
   res_ls<- format_res %>% 
     dplyr::filter(stomata.per.row>1) %>% 
     droplevels() %>% 
@@ -88,8 +90,6 @@ for (folder in folders){
       tidyr::pivot_wider(names_from = 'term',values_from = 'estimate')
   )
   
-  
-  
   slop_name <- paste0("result/intermediate/",folder,"/",folder,"_slope.csv")
   write.csv(slope_df,slop_name,row.names = F)
   setTxtProgressBar(pb,2)
@@ -110,7 +110,7 @@ for (folder in folders){
     } 
   )
   iwalk(p_df,~{
-    print(.x)
+    suppressWarnings( print(.x))
   })
   dev.off()
   setTxtProgressBar(pb,3)
