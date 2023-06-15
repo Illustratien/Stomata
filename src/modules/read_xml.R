@@ -14,7 +14,7 @@ folders <-list.dirs("data",recursive = F) %>% gsub("data/","",.)
 dir.create(file.path("./result/intermediate"), showWarnings = FALSE)
 
 for (folder in folders){
-  message(folder)
+  message(paste0("\n",folder))
   message("reading, row class slope and graph:")
   pb = txtProgressBar(min = 0, max = 3,
                       style = 3,    # Progress bar style (also available style = 1 and style = 2)
