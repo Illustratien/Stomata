@@ -6,3 +6,4 @@ pkg.list <-
 local.pkg <- installed.packages()[,"Package"]
 new.packages <- pkg.list[!(pkg.list %in% local.pkg)]
 if(length(new.packages)) install.packages(new.packages)
+devtools::install_github("Illustratien/toolPhD")
