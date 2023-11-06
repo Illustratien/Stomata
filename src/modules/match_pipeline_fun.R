@@ -88,13 +88,13 @@ plotfun <- function(df,disthresh=6.5){
                              mapping=aes(x = stomata.cx, y = display.y,
                                          label=class),
                              point.padding = 1,box.padding = .8,
-                             # a = stomata.length/2, b = stomata.width/2,
-                             # angle = stomata.angle %>% map_dbl(.,~{
-                             #   rad2trans(.x)})),
                              show.legend =F)+
+    
     coord_fixed()+
     theme(axis.title = element_blank(),
           axis.text = element_blank())
+  
+
   # plotdf
 
   
@@ -104,6 +104,12 @@ plotfun <- function(df,disthresh=6.5){
     tbl3 <- gridExtra::tableGrob(repdf %>%
                                    mutate(dist=toolPhD::round_scale(dist)), 
                                  rows=NULL, theme=tt)
+    plotdf <- plotdf+
+      ggrepel::geom_text_repel(data=ndf[repdf$from,],
+                               mapping=aes(x = stomata.cx, y = display.y,
+                                          ), label="R",color="darkred",
+                               point.padding = 1,box.padding = .8,
+                               show.legend =F)
     # Plot chart and table into one object
     p <-  cowplot::plot_grid(plotdf, tb,tbl3,
                              nrow=1,rel_widths = c(5,1.9,1))
