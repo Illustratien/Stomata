@@ -131,7 +131,7 @@ names(plot_res) <- sourcetype
 
 for(k in 1:2){
   pdf(paste0(tarfoldr,"/",folder,"_",sourcetype[k],"_check.pdf"),
-      width=20,
+      width=10,height=4,
       onefile = T)
   
   plot_res[[k]] %>% purrr::walk(.,~{.x %>% print()})
