@@ -75,7 +75,7 @@ plotfun <- function(df,disthresh=30){
     labs(subtitle = paste0("detect/truth = ",
                            round(briefdf[2,2]/briefdf[1,2],digit=2),
                            # "% \nestimated repeated coordinates = ",repn,
-                           "\nmiss match = ",ntd %>%filter(is.na(gid)) %>% nrow(),
+                           "  miss match = ",ntd %>%filter(is.na(gid)) %>% nrow(),
                            "                , new match= ",unmd),
          # caption = paste0("dist threshold",disthresh)
     )+
