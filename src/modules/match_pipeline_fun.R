@@ -1,31 +1,55 @@
-plotfun <- function(df,disthresh=6.5){
+shp <-c(5,9,1,8,10)
+names(shp) <- c("blurry.complete","blurry.incomplete","complete","hair","incomplete")
+
+plotfun <- function(df,disthresh=30){
   # disthresh : threshold value to judge whether it belongs to same point or not
   ndf <- df%>%filter(type=="ntu")
   gdf <-   df%>%filter(type=="truth")
   if(nrow(gdf)==0){
     stop(sprintf("no ground truth found for  %s!",df$pic_name[1]))
   }
-  
-  shp <-c(5,9,1,8,10)
-  names(shp) <- c("blurry.complete","blurry.incomplete","complete","hair","incomplete")
-  
+  # match each point to ground truth
   ntd<- map_dfr(1:nrow(ndf),~{
+    # for each point in estimated pipeline
+    # bind witn ground truth and calculate the distance
     d <- bind_rows(ndf[.x,],
                    gdf) %>% 
       dplyr::select(stomata.cx,stomata.cy) %>% 
       stats::dist() %>%
       as.matrix(diag = TRUE, upper = TRUE) 
     # focus on distance not larger than 20 (subset distance matrix)
-    condi <- setdiff(which(d[1,]<20),1)
+    condi <- setdiff(which(d[1,]<disthresh),1)-1
     
     ndf[.x,] %>% 
-      mutate(gid=  ifelse(length(condi)==0,NA,condi)) %>% 
-      mutate(        gx=ifelse(!is.na(gid),gdf[gid,"stomata.cx"],NA),
-                     gy=ifelse(!is.na(gid),gdf[gid,"stomata.cy"],NA)
+      mutate(
+        # row index of ground truth that falls within this threshold
+        gid=  ifelse(length(condi)==0,NA,condi),
+        # ground truth x
+        truth.cx=ifelse(!is.na(gid),gdf[gid,]$"stomata.cx",NA),
+        # ground truth y
+        truth.cy=ifelse(!is.na(gid),gdf[gid,]$"stomata.cy",NA)
       )
-  })%>% mutate(display.y=1944-stomata.cy) 
+  })%>%
+    mutate(display.y=1944-stomata.cy) 
   
-  SummaryTable <- df %>% 
+  # check how many points share the same ground truth 
+  repeateddf <- ntd %>%
+    na.omit() %>% 
+    group_by(gid) %>%
+    summarise(n=n()-1) %>% 
+    filter(n>0)
+  
+  ntd <- rbind(ntd %>%
+                 filter(!is.na(gid)) %>% 
+                 group_by(gid) %>%
+                 filter(confidence==max(confidence)),
+               ntd %>%
+                 filter(is.na(gid))) %>% ungroup()
+  
+  # repn <-repeateddf%>% nrow()
+  unmd <- nrow(gdf)-ntd$gid %>% na.omit()%>% unique() %>% length()
+  # -------------------------------------------------------------------------
+  SummaryTable <- bind_rows(gdf,ntd) %>% 
     group_by(type) %>% mutate(totaln=n()) %>% 
     group_by(type,class) %>% mutate(indivin=n()) %>% 
     select(type,class,totaln,indivin) %>% distinct()
@@ -35,35 +59,8 @@ plotfun <- function(df,disthresh=6.5){
                        values_from = indivin) %>% 
     mutate(ratio=(ntu/truth) %>%
              round(.,digits = 2))
-  tt <- gridExtra::ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
   
-  tbl <- gridExtra::tableGrob(detaildf %>% 
-                                mutate(ratio=toolPhD::round_scale(ratio)),
-                   rows=NULL, theme=tt)
-  tbl2 <- gridExtra::tableGrob(briefdf %>% t(), rows=NULL, theme=tt)
-  
-  tb <- gridExtra::arrangeGrob(tbl2,tbl,nrow=2,
-                    # as.table=TRUE,
-                    heights=c(3,3))
-  # calculate distance of each points in the new detected df
-  d <- ndf %>% 
-    dplyr::select(stomata.cx,stomata.cy) %>% 
-    stats::dist() %>%
-    as.matrix(diag = TRUE, upper = TRUE) 
-  d[lower.tri(d,diag = T)] <- NA
-  #generate from-to index 
-  mat <- as.data.frame(t(combn(dim(ndf)[1],2))) 
-  colnames(mat) <- c('from','to')
-  mat <- mat %>% mutate(
-    # transform the upper triangle into linear by row
-    dist=na.omit(as.vector(t(d))))
-  repdf <- mat %>% group_by(from) %>%
-    dplyr::filter(dist==min(dist,na.rm = T)) %>% filter(dist<disthresh) 
-
-
-  repn <-repdf%>% nrow()
-  unmd <- nrow(gdf)-ntd$gid %>% na.omit()%>% unique() %>% length()
-  
+  # -------------------------------------------------------------------------
   plotdf <- df%>% 
     ggplot(aes(stomata.cx,display.y))+
     geom_point(data=ntd %>% 
@@ -76,13 +73,15 @@ plotfun <- function(df,disthresh=6.5){
     theme_bw()+
     ggtitle(df$pic_name[1])+
     labs(subtitle = paste0("detect/truth = ",
-                   round(briefdf[2,2]/briefdf[1,2],digit=2),
-                   "% \nestimated repeated coordinates = ",repn,
-                   "\nmismatch = ",ntd %>%filter(is.na(gid)) %>% nrow(),
-                   "                , unmatch = ",unmd),
-         caption = paste0("dist threshold",disthresh))+
-
+                           round(briefdf[2,2]/briefdf[1,2],digit=2),
+                           # "% \nestimated repeated coordinates = ",repn,
+                           "\nmiss match = ",ntd %>%filter(is.na(gid)) %>% nrow(),
+                           "                , new match= ",unmd),
+         # caption = paste0("dist threshold",disthresh)
+    )+
+    
     # facet_grid(~pic_name)+
+    #Label new
     ggrepel::geom_text_repel(data=ntd %>% 
                                filter(is.na(gid)),
                              mapping=aes(x = stomata.cx, y = display.y,
@@ -92,40 +91,49 @@ plotfun <- function(df,disthresh=6.5){
     
     coord_fixed()+
     theme(axis.title = element_blank(),
-          axis.text = element_blank())
+          # axis.text = element_blank()
+    )
   
-
   # plotdf
-
   
+  # table
+  tt <- gridExtra::ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
   
+  tbl <- gridExtra::tableGrob(detaildf %>% 
+                                mutate(ratio=toolPhD::round_scale(ratio)),
+                              rows=NULL, theme=tt)
+  tbl2 <- gridExtra::tableGrob(briefdf %>% t(), rows=NULL, theme=tt)
+  
+  tb <- gridExtra::arrangeGrob(tbl2,tbl,nrow=2,
+                               # as.table=TRUE,
+                               heights=c(3,3))
   # Plot chart and table into one object
-  if(nrow(repdf)>0){
-    tbl3 <- gridExtra::tableGrob(repdf %>%
-                                   mutate(dist=toolPhD::round_scale(dist)), 
-                                 rows=NULL, theme=tt)
-    plotdf <- plotdf+
-      ggrepel::geom_text_repel(data=ndf[repdf$from,],
-                               mapping=aes(x = stomata.cx, y = display.y,
-                                          ), label="R",color="darkred",
-                               point.padding = 1,box.padding = .8,
-                               show.legend =F)
-    # Plot chart and table into one object
-    p <-  cowplot::plot_grid(plotdf, tb,tbl3,
-                             nrow=1,rel_widths = c(5,1.9,1))
-  }else{
-    p <-  cowplot::plot_grid(plotdf, tb,
-                             nrow=1,rel_widths = c(5,1.9))
-  }
-
-
+  # if(nrow(repdf)>0){
+  #   tbl3 <- gridExtra::tableGrob(repdf %>%
+  #                                  mutate(dist=toolPhD::round_scale(dist)), 
+  #                                rows=NULL, theme=tt)
+  #   plotdf <- plotdf+
+  #     ggrepel::geom_text_repel(data=ndf[repdf$from,],
+  #                              mapping=aes(x = stomata.cx, y = display.y,
+  #                              ), label="R",color="darkred",
+  #                              point.padding = 1,box.padding = .8,
+  #                              show.legend =F)
+  #   # Plot chart and table into one object
+  #   p <-  cowplot::plot_grid(plotdf, tb,tbl3,
+  #                            nrow=1,rel_widths = c(5,1.9,1))
+  # }else{
+  p <-  cowplot::plot_grid(plotdf, tb,
+                           nrow=1,rel_widths = c(5,1.9))
+  # }
+  
+  
   # print(p)
   
   resdf <- data.frame(pic_name=df$pic_name[1],
                       detect=briefdf[2,]$totaln,
                       ground=briefdf[1,]$totaln,
-                      rep_cor=repn,
                       mismatch = ntd %>%filter(is.na(gid)) %>% nrow(),
                       unmatch = unmd)
-  return(list(resdf,p))
+  ntd <- ntd %>% ungroup() %>% dplyr::select(-c(id,gid,type,display.y))
+  return(list(resdf,p,ntd))
 }
