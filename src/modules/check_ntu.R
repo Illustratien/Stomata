@@ -8,7 +8,7 @@ sourcetype <- ntu_file %>% strsplit("_") %>%
 
 ntu_dlist <- map(ntu_file,~{
   data.table::fread(file.path("result/Ntu/",.x)) %>% 
-   rename(pic_name="File Name") %>% 
+    rename(pic_name="File Name") %>% 
     # recover the unit of bounding box length to pixel 
     mutate(
       across(ends_with(c("x", "width")),~.x*2592),
@@ -98,8 +98,8 @@ setTxtProgressBar(pb,2)
 # -------------------------------------------------------------------------
 gmeg <- ground_df %>% 
   select(-c(stomata.row,stomata.per.row,pic_width,pic_height,
-                                display.y,type)) %>% 
-  rename(truth_class=class)
+            display.y,type)) %>% 
+  rename(truth.class=class) 
 names(gmeg)<- gsub("(stomata\\.|boundingbox_)","truth.",names(gmeg))
 
 dff<- map_depth(re,2,~{.x[[3]]}) %>% 
@@ -109,12 +109,18 @@ dff<- map_depth(re,2,~{.x[[3]]}) %>%
       left_join(.,ntu_dlist[[.y]],
                 by=c("stomata.cx", "stomata.cy", "pic_name",
                      "class","confidence"))
-      }) %>% 
+  }) %>% 
   Reduce("rbind",.) %>% 
   dplyr::select(-type)%>% 
-  rename(detect_class=class)
-names(dff)<- gsub("(stomata\\.|boundingbox_)","detect_",names(dff))
-data.table::fwrite(dff%>% left_join(.,gmeg,c("pic_name", "truth.cx","truth.cy")),
+  rename(detect.class=class)
+names(dff)<- gsub("(stomata\\.|boundingbox_)","detect.",names(dff))
+out <- dff%>% rename(detect.length=detect.height) %>% 
+  mutate(detect.area=detect.width*detect.length)  %>% 
+  left_join(.,gmeg%>% 
+              mutate(truth.area=truth.width*truth.length),c("pic_name", "truth.cx","truth.cy")) %>% 
+  relocate(source,pic_name,detect.width,detect.length,detect.area)
+
+data.table::fwrite(out,
                    paste0(tarfoldr,"/",folder,"_detect.csv"),row.names = F)
 
 # plot --------------------------------------------------------------------
