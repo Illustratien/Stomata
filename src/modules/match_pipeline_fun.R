@@ -61,26 +61,25 @@ plotfun <- function(df,disthresh=30){
              round(.,digits = 2))
   
   # -------------------------------------------------------------------------
-  plotdf <- df%>% 
+  plotdf <- bind_rows(gdf,ntd) %>% 
     ggplot(aes(stomata.cx,display.y))+
+    # new detected 
     geom_point(data=ntd %>% 
                  filter(is.na(gid)),
                mapping=aes(x = stomata.cx, y = display.y,shape=class),
                show.legend = F,size=3,
                color="black",stroke=2.5,alpha=.5)+
+    # old
     geom_point(aes(shape=class,color=type),size=3,stroke=1.5,alpha=.5)+
     scale_shape_manual(values=1:5)+
     theme_bw()+
-    ggtitle(df$pic_name[1])+
-    labs(subtitle = paste0("detect/truth = ",
+    ggtitle(paste0(df$pic_name[1],"\ndetect/truth = ",
                            round(briefdf[2,2]/briefdf[1,2],digit=2),
                            # "% \nestimated repeated coordinates = ",repn,
-                           "  miss match = ",ntd %>%filter(is.na(gid)) %>% nrow(),
-                           "                , new match= ",unmd),
-         # caption = paste0("dist threshold",disthresh)
+                           "  miss match = ",unmd,
+                           "                , new match= ",ntd %>%filter(is.na(gid)) %>% nrow())
     )+
-    
-    # facet_grid(~pic_name)+
+    labs(caption=paste0("distance tolerance: ",disthresh, "(pixel)"))+
     #Label new
     ggrepel::geom_text_repel(data=ntd %>% 
                                filter(is.na(gid)),
@@ -94,7 +93,6 @@ plotfun <- function(df,disthresh=30){
           # axis.text = element_blank()
     )
   
-  # plotdf
   
   # table
   tt <- gridExtra::ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
@@ -108,32 +106,14 @@ plotfun <- function(df,disthresh=30){
                                # as.table=TRUE,
                                heights=c(3,3))
   # Plot chart and table into one object
-  # if(nrow(repdf)>0){
-  #   tbl3 <- gridExtra::tableGrob(repdf %>%
-  #                                  mutate(dist=toolPhD::round_scale(dist)), 
-  #                                rows=NULL, theme=tt)
-  #   plotdf <- plotdf+
-  #     ggrepel::geom_text_repel(data=ndf[repdf$from,],
-  #                              mapping=aes(x = stomata.cx, y = display.y,
-  #                              ), label="R",color="darkred",
-  #                              point.padding = 1,box.padding = .8,
-  #                              show.legend =F)
-  #   # Plot chart and table into one object
-  #   p <-  cowplot::plot_grid(plotdf, tb,tbl3,
-  #                            nrow=1,rel_widths = c(5,1.9,1))
-  # }else{
   p <-  cowplot::plot_grid(plotdf, tb,
-                           nrow=1,rel_widths = c(5,1.9))
-  # }
-  
-  
-  # print(p)
-  
+                           nrow=1,rel_widths = c(5,2.3))
+
   resdf <- data.frame(pic_name=df$pic_name[1],
                       detect=briefdf[2,]$totaln,
                       ground=briefdf[1,]$totaln,
-                      mismatch = ntd %>%filter(is.na(gid)) %>% nrow(),
-                      unmatch = unmd)
+                      new.match = ntd %>%filter(is.na(gid)) %>% nrow(),
+                      miss.match = unmd)
   ntd <- ntd %>% ungroup() %>% dplyr::select(-c(id,gid,type,display.y))
   return(list(resdf,p,ntd))
 }
