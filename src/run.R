@@ -24,9 +24,8 @@ system.time(
   source("src/modules/summarize_and_merge.R")
 )
 
-
 # check two pipelines -----------------------------------------------------
-# add the NTU pipeline results (e.g., "res_noblurry.xlsx", "res_wblurry.xlsx") under "result/Ntu/"
+# add the NTU pipeline results (e.g., "res_noblurry.csv", "res_wblurry.csv") under "result/Ntu/"
 # run 
 system.time(
   source("src/modules/check_ntu.R")
