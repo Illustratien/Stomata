@@ -132,28 +132,41 @@ data.table::fwrite(out,
                    paste0(tarfoldr,"/",folder,"_detect.csv"),row.names = F)
 
 # -------------------------------------------------------------------------
-out %>% 
-  dplyr::filter(!truth.class=="hair") %>%
-  ggplot(aes(detect.height,truth.height))+
-  geom_point(shape=1)+
+colv <- c(names(out)[grepl("(width|height)",names(out))],"pic_name","truth.class","source","confidence","detect.class")
+
+longdf <- out %>% select(all_of(colv)) %>% mutate(id=1:n()) %>% 
+  tidyr::pivot_longer(
+    -c(id,pic_name,truth.class,source,confidence,detect.class),
+    names_to = c("Var", ".value"), 
+    names_sep="\\." ) %>% 
+  tidyr::pivot_longer(width:height,names_to="trait",
+                      values_to = "Trait") %>% 
+  tidyr::pivot_wider(values_from = Trait,names_from = Var) 
+
+longdf%>% filter(truth.class=="complete") %>% 
+  ggplot(aes(detect,truth))+
+  geom_point(shape=1,aes(color=confidence))+
+  scale_color_viridis_c()+
   geom_abline(intercept = 0,slope=1)+
   scale_x_continuous(limits = c(0,200))+
   scale_y_continuous(limits = c(0,200))+
-    facet_grid(~source)+theme_phd_facet()+
-  stat_poly_line() +
-  stat_poly_eq(use_label(c("eq", "R2"))) 
+  facet_grid(trait~source)+theme_phd_facet()+
+  stat_poly_line(color="darkred") +
+  stat_poly_eq(use_label(c("eq", "R2")))+
+  ggtitle("complete ground truth")
 
-
-out %>% 
-  dplyr::filter(!truth.class=="hair") %>%
-  ggplot(aes(detect.width,truth.width))+
-  geom_point(shape=1)+
+longdf%>% filter(detect.class=="complete") %>% 
+  ggplot(aes(detect,truth))+
+  geom_point(shape=1,aes(color=confidence))+
+  scale_color_viridis_c()+
   geom_abline(intercept = 0,slope=1)+
   scale_x_continuous(limits = c(0,200))+
   scale_y_continuous(limits = c(0,200))+
-  facet_grid(~source)+theme_phd_facet()+
-  stat_poly_line() +
-  stat_poly_eq(use_label(c("eq", "R2"))) 
+  facet_grid(trait~source)+theme_phd_facet()+
+  stat_poly_line(color="darkred") +
+  stat_poly_eq(use_label(c("eq", "R2")))+
+  ggtitle("complete detect truth")
+
 
 # plot --------------------------------------------------------------------
 message("\nexport pdf:")
