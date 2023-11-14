@@ -1,5 +1,5 @@
 rm(list = ls())
-pacman::p_load(toolPhD,dplyr,ggplot2,purrr,gridExtra,foreach)
+pacman::p_load(toolPhD,dplyr,ggplot2,purrr,gridExtra,foreach,ggpmisc)
 
 # read files --------------------------------------------------------------
 ntu_file <- list.files("result/Ntu")
@@ -31,14 +31,22 @@ ground_df <- read.csv(sprintf("result/intermediate/%s/%s_xml_data.csv",folder,fo
 # picturname that is in ground truth 
 gdf_pic <- ground_df$pic_name %>% unique()
 ntu_pic <- ntu_dlist[[1]]$pic_name %>% unique()
-if(length(ntu_pic)>length(gdf_pic)){
-  ntu_dlist <- map(ntu_dlist,~{
+in_pic <- intersect(gdf_pic,ntu_pic)
+
+ntu_dlist <- map(ntu_dlist,~{
     # filter the data of estimation that can match the ground truth
-    .x %>% filter(pic_name%in%gdf_pic)
+    .x %>% filter(pic_name%in%in_pic)
   })
-}else if(length(ntu_pic)<length(gdf_pic)){
-  ground_df <- ground_df %>% filter(pic_name%in%ntu_pic)
-}
+ground_df <- ground_df %>% filter(pic_name%in%in_pic)
+
+# if(length(ntu_pic)>length(gdf_pic)){
+#   ntu_dlist <- map(ntu_dlist,~{
+#     # filter the data of estimation that can match the ground truth
+#     .x %>% filter(pic_name%in%gdf_pic)
+#   })
+# }else if(length(ntu_pic)<length(gdf_pic)){
+#   ground_df <- ground_df %>% filter(pic_name%in%ntu_pic)
+# }
 
 pb = txtProgressBar(min = 0, max = 4,
                     style = 3,    # Progress bar style (also available style = 1 and style = 2)
@@ -114,14 +122,38 @@ dff<- map_depth(re,2,~{.x[[3]]}) %>%
   dplyr::select(-type)%>% 
   rename(detect.class=class)
 names(dff)<- gsub("(stomata\\.|boundingbox_)","detect.",names(dff))
-out <- dff%>% rename(detect.length=detect.height) %>% 
-  mutate(detect.area=detect.width*detect.length)  %>% 
+out <- dff%>% 
+  mutate(detect.area=detect.width*detect.height)  %>% 
   left_join(.,gmeg%>% 
-              mutate(truth.area=truth.width*truth.length),c("pic_name", "truth.cx","truth.cy")) %>% 
-  relocate(source,pic_name,detect.width,detect.length,detect.area)
+              mutate(truth.area=truth.width*truth.height),c("pic_name", "truth.cx","truth.cy")) %>% 
+  relocate(source,pic_name,detect.width,detect.height,detect.area)
 
 data.table::fwrite(out,
                    paste0(tarfoldr,"/",folder,"_detect.csv"),row.names = F)
+
+# -------------------------------------------------------------------------
+out %>% 
+  dplyr::filter(!truth.class=="hair") %>%
+  ggplot(aes(detect.height,truth.height))+
+  geom_point(shape=1)+
+  geom_abline(intercept = 0,slope=1)+
+  scale_x_continuous(limits = c(0,200))+
+  scale_y_continuous(limits = c(0,200))+
+    facet_grid(~source)+theme_phd_facet()+
+  stat_poly_line() +
+  stat_poly_eq(use_label(c("eq", "R2"))) 
+
+
+out %>% 
+  dplyr::filter(!truth.class=="hair") %>%
+  ggplot(aes(detect.width,truth.width))+
+  geom_point(shape=1)+
+  geom_abline(intercept = 0,slope=1)+
+  scale_x_continuous(limits = c(0,200))+
+  scale_y_continuous(limits = c(0,200))+
+  facet_grid(~source)+theme_phd_facet()+
+  stat_poly_line() +
+  stat_poly_eq(use_label(c("eq", "R2"))) 
 
 # plot --------------------------------------------------------------------
 message("\nexport pdf:")

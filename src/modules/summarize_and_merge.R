@@ -17,7 +17,8 @@ iwalk(folders,function(folder,i){
     select(pic_name:row_kurtosis,-stomata.row) %>% 
     mutate(pic_name=as.factor(pic_name)) %>% 
     group_by(pic_name) %>% 
-    summarise(across(where(is.numeric),mean))
+    summarise(across(where(is.numeric),mean),
+              .groups = 'drop')
   raw <- paste0(inter_path,"/",folder,"_xml_data.csv")%>% read.csv() %>% 
     group_by(pic_name,stomata.type) %>% 
     summarise(stomata.type.count=n()) %>% 
@@ -27,7 +28,8 @@ iwalk(folders,function(folder,i){
     summarise(across(stomata.per.row,list(mean=mean,sd=sd)),
               across(slope,
                      list(mean=mean,sd=sd),.names=paste0("row_","{.col}_{.fn}")
-              ))
+                    
+              ), .groups = 'drop')
   
   res <- list(raw,stat,slope,rowdis,row_stat) %>%
     Reduce(function(x, y) left_join(x, y, by = "pic_name"), .) %>% 

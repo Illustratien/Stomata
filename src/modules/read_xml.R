@@ -45,7 +45,7 @@ for (folder in folders){
     names(format_res) %>%
     gsub("robndbox","stomata",.)
   format_res<- format_res %>%
-    rename(stomata.length=stomata.w,stomata.width=stomata.h)
+    rename(stomata.height=stomata.h,stomata.width=stomata.w)
   
   
   raw_name <- paste0("result/intermediate/",folder,"/",folder,"_xml_data.csv")

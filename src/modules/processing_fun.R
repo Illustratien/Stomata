@@ -39,7 +39,7 @@ plot_fun <- function(df){
     scale_y_continuous("y",limits = c(0,df[["pic_height"]][1]))+
     ggforce::geom_ellipse(data=df %>% filter(!grepl("incomplete",stomata.type)),
                           mapping=aes(x0 = stomata.cx, y0 = display.y,
-                                      a = stomata.length/2, b = stomata.width/2, 
+                                      a = stomata.height/2, b = stomata.width/2, 
                                       angle = stomata.angle %>% map_dbl(.,~{
                                         rad2trans(.x)})),
                           show.legend =F)+
@@ -108,7 +108,7 @@ complete_count <- function(df){
   df %>% 
     dplyr::filter(grepl("^complete$",stomata.type)) %>% 
     group_by(!!!g) %>% 
-    dplyr::summarise(across(c(stomata.length,stomata.width),list(mean=mean,sd=sd)),
+    dplyr::summarise(across(c(stomata.height,stomata.width),list(mean=mean,sd=sd)),
                      stomata.complete_count=n())
   # %>% 
   # tidyr::pivot_longer(-c(!!!g),names_to = 'trait',values_to = 'Trait')
@@ -131,7 +131,7 @@ weight_statistic <- function(df){
     mutate(stomata.Nr.weight=case_when(grepl("\\b\\.?complete\\b",stomata.type)~1,
                                        grepl("hair",stomata.type)~0,
                                        T~.5),
-           area=pi*(stomata.length/2)*(stomata.width/2),
+           area=pi*(stomata.height/2)*(stomata.width/2),
            pic_area=(pic_width*pic_height)
     ) %>% 
     summarise(effective.stomatal.count=sum(stomata.Nr.weight),
