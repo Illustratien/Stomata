@@ -21,10 +21,17 @@ ntu_dlist <- map(ntu_file,~{
 })
 
 # experiment folder name 
-folder <- ntu_dlist[[1]]$pic_name[1] %>% strsplit("_") %>% .[[1]] %>% .[1] 
-message(paste0("\n",folder))
+folder <-ntu_dlist[[1]]$pic_name %>% strsplit("_") %>% map_depth(.,1,~{.x[1]}) %>% unlist() %>% unique() %>% paste(.,collapse="_")
 
-ground_df <- read.csv(sprintf("result/intermediate/%s/%s_xml_data.csv",folder,folder)) %>% 
+# message(paste0("\n",folder))
+
+g_dfvec <- list.files(path = "result/intermediate/",pattern = "*data.csv",recursive = T,full.names = T)
+# ground_df <- map_dfr(folder,~{
+#   read.csv(sprintf("result/intermediate/%s/%s_xml_data.csv",.x,.x)) 
+# }) %>% 
+ground_df <- map_dfr(g_dfvec,~{
+  read.csv(.x)
+}) %>% 
   mutate(type="truth") %>% 
   rename(class=stomata.type)
 
@@ -151,7 +158,7 @@ longdf%>% filter(truth.class=="complete") %>%
   scale_x_continuous(limits = c(0,200))+
   scale_y_continuous(limits = c(0,200))+
   facet_grid(trait~source)+theme_phd_facet()+
-  stat_poly_line(color="darkred") +
+  stat_poly_line(color="darkred",se=F) +
   stat_poly_eq(use_label(c("eq", "R2")))+
   ggtitle("complete ground truth")
 
@@ -163,7 +170,7 @@ longdf%>% filter(detect.class=="complete") %>%
   scale_x_continuous(limits = c(0,200))+
   scale_y_continuous(limits = c(0,200))+
   facet_grid(trait~source)+theme_phd_facet()+
-  stat_poly_line(color="darkred") +
+  stat_poly_line(color="darkred",se=F) +
   stat_poly_eq(use_label(c("eq", "R2")))+
   ggtitle("complete detect truth")
 
