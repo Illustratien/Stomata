@@ -53,6 +53,14 @@ for (folder in folders){
             raw_name,
             row.names = F  )
   setTxtProgressBar(pb,1)
+  
+  subdf <- format_res %>% filter(is.na(stomata.cx))
+  if(nrow(subdf)>0){
+    pl <-   unique(subdf$pic_name) %>% paste(.,collapse="\n")
+    warnings(sprintf("These file contains wrongly labled rectangles!, please check:\n %s",
+                    pl ))
+  }
+  
   # slope -------------------------------------------------------------------
   
   format_res <- read.csv(raw_name)%>% 
