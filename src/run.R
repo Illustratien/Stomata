@@ -27,6 +27,14 @@ system.time(
 # check two pipelines -----------------------------------------------------
 # add the NTU pipeline results (e.g., "res_noblurry.csv", "res_wblurry.csv") under "result/Ntu/"
 # run 
+
 system.time(
   source("src/modules/check_ntu.R")
 )
+
+
+# run this for the no ground truth ntu pipeline results-------------------------------------------------------------------------
+# put the NTU pipeline results (e.g., "res_noblurry.csv", "res_wblurry.csv") under "result/Ntu_no_thruth/"
+dir.create(file.path("./result/Ntu_no_truth"), showWarnings = FALSE)
+source("src/modules/clean_ntu.R")
+

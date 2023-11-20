@@ -1,7 +1,7 @@
 shp <-c(5,9,1,8,10)
 names(shp) <- c("blurry.complete","blurry.incomplete","complete","hair","incomplete")
 
-plotfun <- function(df,disthresh=30){
+plotfun <- function(df,disthresh=80){
   # disthresh : threshold value to judge whether it belongs to same point or not
   ndf <- df%>%filter(type=="ntu")
   gdf <-   df%>%filter(type=="truth")
@@ -116,4 +116,44 @@ plotfun <- function(df,disthresh=30){
                       miss.match = unmd)
   ntd <- ntd %>% ungroup() %>% dplyr::select(-c(id,gid,type,display.y))
   return(list(resdf,p,ntd))
+}
+
+rm_rep <- function(ndf,disthresh = 10){
+  # for removing the replicate from NTU alone
+  d <- ndf %>% 
+    dplyr::select(stomata.cx,stomata.cy) %>% 
+    stats::dist() %>%
+    as.matrix(diag = TRUE, upper = TRUE) 
+  d[lower.tri(d,diag = T)] <- NA
+  #generate from-to index 
+  mat <- as.data.frame(t(combn(dim(ndf)[1],2))) 
+  colnames(mat) <- c('from','to')
+  mat <- mat %>% mutate(
+    # transform the upper triangle into linear by row
+    dist=na.omit(as.vector(t(d))))
+  repdf <- mat %>% group_by(from) %>%
+    dplyr::filter(dist==min(dist,na.rm = T),dist<disthresh) %>%
+    mutate(gid=row_number())
+  repid <- repdf %>% .[,1:2] %>% unlist()
+  
+  if (nrow(repdf)>0){
+    
+    ndf <- ndf %>% mutate(gid=NA,id=row_number())
+    for(i in 1:nrow(repdf)){
+      tid <- repdf[i,1:2] %>% unlist() %>% as.numeric()
+      ndf <- ndf %>% mutate(gid=case_when(id%in%tid~i,
+                                          T~gid))  
+    }
+    
+    res <- rbind(ndf %>%
+                   filter(!is.na(gid)) %>% 
+                   group_by(gid) %>%
+                   filter(confidence==max(confidence)),
+                 ndf %>%
+                   filter(is.na(gid))) %>% ungroup()
+  }else{
+    res <- ndf
+  }
+  
+  return(res %>% select(-c("gid","id")))
 }

@@ -68,12 +68,14 @@ my.cluster <- parallel::makeCluster(
   type = "PSOCK"
 )
 doParallel::registerDoParallel(cl = my.cluster)
-
+source("src/modules/match_pipeline_fun.R")
 system.time(
   re <- purrr::map (1:2,function(k){ # for with blurry and without blurry
     # subset data and merge
     ntu_df <- ntu_dlist[[k]] %>% 
-      dplyr::select(stomata.cx,stomata.cy,pic_name,class,confidence,type)
+      dplyr::select(stomata.cx,stomata.cy,pic_name,class,confidence,type) %>% 
+      group_by(pic_name) %>% group_split() %>% 
+      map_dfr(.,~{rm_rep(.x)})
     pic_tar<- ntu_df$pic_name %>% unique()
     # split for each picture 
     mdf<- bind_rows(ground_df %>% 
