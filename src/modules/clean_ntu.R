@@ -9,7 +9,7 @@
 # list.files("result/Ntu")#"result/Ntu_no_truth"
 rm(list = ls())
 source("src/modules/match_pipeline_fun.R")
-ntu_file <- list.files("result/Ntu_no_truth")
+ntu_file <- list.files("result/Ntu_no_truth",pattern="*.csv")
 sourcetype <- ntu_file %>% strsplit("_") %>% 
   map_depth(.,1,~{.x[2]}) %>% unlist() %>% gsub(".csv","",.)
 names(ntu_file) <- sourcetype

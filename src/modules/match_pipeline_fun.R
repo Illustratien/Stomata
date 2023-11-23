@@ -150,10 +150,11 @@ rm_rep <- function(ndf,disthresh = 10){
                    group_by(gid) %>%
                    filter(confidence==max(confidence)),
                  ndf %>%
-                   filter(is.na(gid))) %>% ungroup()
+                   filter(is.na(gid))) %>% ungroup()%>%
+      select(-c("gid","id"))
   }else{
     res <- ndf
   }
   
-  return(res %>% select(-c("gid","id")))
+  return(res )
 }
