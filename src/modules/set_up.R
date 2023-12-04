@@ -1,6 +1,6 @@
 pkg.list <- 
   c("XML","purrr", "ggforce",   
-    "dplyr", "moments",
+    "dplyr", "moments",'Rdpack','devtools',
     # "ROI.plugin.glpk","ompr.roi","ompr", 
     "rlang" ,"tidyr", "pacman" ,  "ggbeeswarm","sma",
     "parallel","doParallel","broom")
