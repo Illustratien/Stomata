@@ -159,7 +159,7 @@ longdf%>% filter(truth.class=="complete") %>%
   geom_abline(intercept = 0,slope=1)+
   scale_x_continuous(limits = c(0,200))+
   scale_y_continuous(limits = c(0,200))+
-  facet_grid(trait~source)+theme_phd_facet()+
+  facet_grid(trait~source)+theme_test()+
   stat_poly_line(color="darkred",se=F) +
   stat_poly_eq(use_label(c("eq", "R2")))+
   ggtitle("complete ground truth")
@@ -171,7 +171,7 @@ longdf%>% filter(detect.class=="complete") %>%
   geom_abline(intercept = 0,slope=1)+
   scale_x_continuous(limits = c(0,200))+
   scale_y_continuous(limits = c(0,200))+
-  facet_grid(trait~source)+theme_phd_facet()+
+  facet_grid(trait~source)+theme_test()+
   stat_poly_line(color="darkred",se=F) +
   stat_poly_eq(use_label(c("eq", "R2")))+
   ggtitle("complete detect truth")
