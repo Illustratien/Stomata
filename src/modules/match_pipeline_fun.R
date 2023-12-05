@@ -98,7 +98,7 @@ plotfun <- function(df,disthresh=80){
   tt <- gridExtra::ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
   
   tbl <- gridExtra::tableGrob(detaildf %>% 
-                                mutate(ratio=toolPhD::round_scale(ratio)),
+                                mutate(ratio=round(ratio,3)),
                               rows=NULL, theme=tt)
   tbl2 <- gridExtra::tableGrob(briefdf %>% t(), rows=NULL, theme=tt)
   

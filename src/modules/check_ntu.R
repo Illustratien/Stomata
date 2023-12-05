@@ -1,5 +1,5 @@
 rm(list = ls())
-pacman::p_load(toolPhD,dplyr,ggplot2,purrr,gridExtra,foreach,ggpmisc)
+pacman::p_load(dplyr,ggplot2,purrr,gridExtra,foreach,ggpmisc)
 
 # read files --------------------------------------------------------------
 ntu_file <- list.files("result/Ntu")
@@ -89,7 +89,7 @@ system.time(
     
     res <- foreach(
       i  = 1:length(mdf),
-      .packages = c("dplyr","purrr","ggplot2","tidyr","gridExtra","toolPhD")
+      .packages = c("dplyr","purrr","ggplot2","tidyr","gridExtra")
     ) %dopar% {
       source("src/modules/match_pipeline_fun.R")
       plotfun(mdf[[i]])
