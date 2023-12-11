@@ -40,12 +40,16 @@ ntu_merge <- imap_dfr(ntu_file,~{
     mutate(
       source=.y,
       across(ends_with(c("x", "width")),~.x*2592),
-      across(ends_with(c("y", "height")),~.x*1944))
+      across(ends_with(c("y", "length")),~.x*1944))
   
   names(res)<- gsub("(stomata\\.|boundingbox_)","detect.",names(res))
   
-  res %>% mutate(detect.area=detect.width*detect.height) %>% 
-    relocate(source,pic_name,detect.width,detect.height,detect.area)
+  res %>%
+    rename(detect.length=detect.height) %>% 
+    mutate(
+      across(c(detect.width,detect.length),function(x){x*0.4}), #from pixel to microm
+      detect.area=detect.width*detect.length) %>%  
+    relocate(source,pic_name,detect.width,detect.length,detect.area)
   
 })
 doParallel::stopImplicitCluster()

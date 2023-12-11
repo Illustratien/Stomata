@@ -2,7 +2,7 @@ rm(list = ls())
 pacman::p_load(dplyr,ggplot2,purrr,gridExtra,foreach,ggpmisc)
 
 # read files --------------------------------------------------------------
-ntu_file <- list.files("result/Ntu")
+ntu_file <- list.files("result/Ntu",pattern='*.csv')
 sourcetype <- ntu_file %>% strsplit("_") %>% 
   map_depth(.,1,~{.x[2]}) %>% unlist() %>% gsub(".csv","",.)
 
@@ -17,7 +17,8 @@ ntu_dlist <- map(ntu_file,~{
       #      boundingbox_y=boundingbox_y*1944,
     )%>% 
     mutate(type="ntu") %>% 
-    rename(stomata.cx=boundingbox_x,stomata.cy=boundingbox_y)
+    rename(stomata.cx=boundingbox_x,stomata.cy=boundingbox_y,boundingbox_length
+           =boundingbox_height)
 })
 
 # experiment folder name 
@@ -41,9 +42,9 @@ ntu_pic <- ntu_dlist[[1]]$pic_name %>% unique()
 in_pic <- intersect(gdf_pic,ntu_pic)
 
 ntu_dlist <- map(ntu_dlist,~{
-    # filter the data of estimation that can match the ground truth
-    .x %>% filter(pic_name%in%in_pic)
-  })
+  # filter the data of estimation that can match the ground truth
+  .x %>% filter(pic_name%in%in_pic)
+})
 ground_df <- ground_df %>% filter(pic_name%in%in_pic)
 
 # if(length(ntu_pic)>length(gdf_pic)){
@@ -114,7 +115,7 @@ message("\nremoved replicates:")
 setTxtProgressBar(pb,2)
 # -------------------------------------------------------------------------
 gmeg <- ground_df %>% 
-  select(-c(stomata.row,stomata.per.row,pic_width,pic_height,
+  select(-c(stomata.row,stomata.per.row,pic_width,pic_length,
             display.y,type)) %>% 
   rename(truth.class=class) 
 names(gmeg)<- gsub("(stomata\\.|boundingbox_)","truth.",names(gmeg))
@@ -132,23 +133,26 @@ dff<- map_depth(re,2,~{.x[[3]]}) %>%
   rename(detect.class=class)
 names(dff)<- gsub("(stomata\\.|boundingbox_)","detect.",names(dff))
 out <- dff%>% 
-  mutate(detect.area=detect.width*detect.height)  %>% 
+  mutate(
+    across(ends_with("length") | ends_with("width"),function(x){x*0.4}), #from pixel to microm
+    detect.area=detect.width*detect.length)  %>% 
   left_join(.,gmeg%>% 
-              mutate(truth.area=truth.width*truth.height),c("pic_name", "truth.cx","truth.cy")) %>% 
-  relocate(source,pic_name,detect.width,detect.height,detect.area)
+              mutate(across(ends_with("length") | ends_with("width"),function(x){x*0.4}), #from pixel to microm               
+                     truth.area=truth.width*truth.length),c("pic_name", "truth.cx","truth.cy")) %>% 
+  relocate(source,pic_name,detect.width,detect.length,detect.area)
 
 data.table::fwrite(out,
                    paste0(tarfoldr,"/",folder,"_detect.csv"),row.names = F)
 
 # -------------------------------------------------------------------------
-colv <- c(names(out)[grepl("(width|height)",names(out))],"pic_name","truth.class","source","confidence","detect.class")
+colv <- c(names(out)[grepl("(width|length)",names(out))],"pic_name","truth.class","source","confidence","detect.class")
 
 longdf <- out %>% select(all_of(colv)) %>% mutate(id=1:n()) %>% 
   tidyr::pivot_longer(
     -c(id,pic_name,truth.class,source,confidence,detect.class),
     names_to = c("Var", ".value"), 
     names_sep="\\." ) %>% 
-  tidyr::pivot_longer(width:height,names_to="trait",
+  tidyr::pivot_longer(width:length,names_to="trait",
                       values_to = "Trait") %>% 
   tidyr::pivot_wider(values_from = Trait,names_from = Var) 
 

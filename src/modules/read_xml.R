@@ -33,7 +33,7 @@ for (folder in folders){
         mutate(i=y)
     } %>%map_dfr(.,~{.x}) %>%
       dplyr::select(-c(type,pose:difficult,i)) %>%
-      dplyr::rename(pic_width=width,pic_height=height,
+      dplyr::rename(pic_width=width,pic_length=length,
                     stomata.type=name,pic_name=pic,
                     stomata.row=rowclass) %>%
       dplyr::relocate(stomata.row) %>%
@@ -45,7 +45,7 @@ for (folder in folders){
     names(format_res) %>%
     gsub("robndbox","stomata",.)
   format_res<- format_res %>%
-    rename(stomata.height=stomata.h,stomata.width=stomata.w)
+    rename(stomata.length=stomata.h,stomata.width=stomata.w)
   
   
   raw_name <- paste0("result/intermediate/",folder,"/",folder,"_xml_data.csv")
