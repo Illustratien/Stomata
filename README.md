@@ -57,6 +57,16 @@ For those picture that is both manually labelled and detected by the
 - note that only picture with the same picture name as ground truth when
   the detected stomata center is 3.2 microm to the ground truth.
 
+## Pull request
+
+Want to contribute to the code? Very welcome!
+
+1.  copy the script that you want to modified in ‘src/test’
+2.  modified the code
+3.  test if there is error
+4.  move it to the original folder and overwrite
+5.  make a pull request
+
 ## ❓ Issues/Problems/Errors
 
 Please raise your question in

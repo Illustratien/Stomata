@@ -39,7 +39,14 @@ For those picture that is both manually labelled and detected by the `NTU`
 1. run [`check_ntu.R`](https://github.com/Illustratien/Stomata/blob/main/src/modules/clean_ntu.R) from line 38-40 to validate the detected data with ground truth 
 * note that only picture with the same picture name as ground truth when the detected stomata center is 3.2 microm to the ground truth. 
 
+## Pull request
+Want to contribute to the code? Very welcome!
 
+1. copy the script that you want to modified in 'src/test'
+2. modified the code
+3. test if there is error
+4. move it to the original folder and overwrite
+5. make a pull request
 
 
 ## ❓ Issues/Problems/Errors
