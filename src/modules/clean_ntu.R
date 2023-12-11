@@ -9,7 +9,8 @@
 # list.files("result/Ntu")#"result/Ntu_no_truth"
 rm(list = ls())
 source("src/modules/match_pipeline_fun.R")
-ntu_file <- list.files("result/Ntu_no_truth",pattern="*.csv")
+pacman::p_load(purrr,dplyr,foreach)
+ntu_file <- list.files("result/Ntu",pattern="*.csv")
 sourcetype <- ntu_file %>% strsplit("_") %>% 
   map_depth(.,1,~{.x[2]}) %>% unlist() %>% gsub(".csv","",.)
 names(ntu_file) <- sourcetype
@@ -49,4 +50,4 @@ ntu_merge <- imap_dfr(ntu_file,~{
 })
 doParallel::stopImplicitCluster()
 
-saveRDS(ntu_merge,file ="result/Ntu_no_truth/detect_merge.RDS" ,compress = T)
+saveRDS(ntu_merge,file ="result/Ntu/detect_merge.RDS" ,compress = T)
