@@ -24,19 +24,17 @@ system.time(
   source("src/modules/summarize_and_merge.R")
 )
 
-# run this for the no ground truth ntu pipeline results-------------------------------------------------------------------------
-# put the NTU pipeline results (e.g., "res_noblurry.csv", "res_wblurry.csv") under "result/Ntu/"
+# NTU pipeline-------------------------------------------------------------------------
+
 dir.create(file.path("./result/Ntu"), showWarnings = FALSE)
-source("src/modules/clean_ntu.R")
+# put the NTU pipeline results (e.g., "res_noblurry.csv", "res_wblurry.csv") under "result/Ntu/"
 
+# remove the duplicate files -------------------------------------------------------------------------
+system.time(
+  source("src/modules/clean_ntu.R")
+)
 
-# check two pipelines -----------------------------------------------------
-# add the NTU pipeline results (e.g., "res_noblurry.csv", "res_wblurry.csv") under "result/Ntu/"
-# run 
-
+# match ground truth data in NTU detection-----------------------------------------------------
 system.time(
   source("src/modules/check_ntu.R")
 )
-
-
-
