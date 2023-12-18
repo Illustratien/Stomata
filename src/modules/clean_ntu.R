@@ -40,7 +40,7 @@ ntu_merge <- imap_dfr(ntu_file,~{
     mutate(
       source=.y,
       across(ends_with(c("x", "width")),~.x*2592),
-      across(ends_with(c("y", "length")),~.x*1944))
+      across(ends_with(c("y", "height")),~.x*1944))
   
   names(res)<- gsub("(stomata\\.|boundingbox_)","detect.",names(res))
   
