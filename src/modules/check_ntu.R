@@ -33,7 +33,7 @@ ground_df <- map_dfr(g_dfvec,~{
 # picturname that is in ground truth 
 gdf_pic <- ground_df$pic_name %>% unique()
 
-iwalk(1:length(folder_vec),function(foldid){
+walk(1:length(folder_vec),function(foldid){
   det_df <- Ntu_dlist[[foldid]]
   folder <- folder_vec[foldid]
   message(paste0("\n",folder))
