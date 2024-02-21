@@ -133,7 +133,7 @@ dff<- map_depth(re,2,~{.x[[3]]}) %>%
 names(dff)<- gsub("(stomata\\.|boundingbox_)","detect.",names(dff))
 out <- dff%>% 
   mutate(detect.area=detect.width*detect.height)  %>% 
-  left_join(.,gmeg%>% 
+  full_join(.,gmeg%>% 
               mutate(truth.area=truth.width*truth.height),c("pic_name", "truth.cx","truth.cy")) %>% 
   relocate(source,pic_name,detect.width,detect.height,detect.area)
 
