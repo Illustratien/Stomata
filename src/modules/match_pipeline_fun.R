@@ -71,7 +71,7 @@ plotfun <- function(df,disthresh=80){
                color="black",stroke=2.5,alpha=.5)+
     # old
     geom_point(aes(shape=class,color=type),size=3,stroke=1.5,alpha=.5)+
-    scale_shape_manual(values=1:5)+
+    scale_shape_manual(values=shp)+
     theme_bw()+
     ggtitle(paste0(df$pic_name[1],"\ndetect/truth = ",
                            round(briefdf[2,2]/briefdf[1,2],digit=2),
@@ -98,7 +98,7 @@ plotfun <- function(df,disthresh=80){
   tt <- gridExtra::ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
   
   tbl <- gridExtra::tableGrob(detaildf %>% 
-                                mutate(ratio=toolPhD::round_scale(ratio)),
+                                mutate(ratio=round(ratio,3)),
                               rows=NULL, theme=tt)
   tbl2 <- gridExtra::tableGrob(briefdf %>% t(), rows=NULL, theme=tt)
   

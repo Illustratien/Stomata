@@ -21,7 +21,7 @@ iwalk(folders,function(folder,i){
               .groups = 'drop')
   raw <- paste0(inter_path,"/",folder,"_xml_data.csv")%>% read.csv() %>% 
     group_by(pic_name,stomata.type) %>% 
-    summarise(stomata.type.count=n()) %>% 
+    summarise(stomata.type.count=n(),.groups = 'drop') %>% 
     pivot_wider(names_from = stomata.type,values_from = stomata.type.count)
   slope <- paste0(inter_path,"/",folder,"_slope.csv")%>% read.csv() %>% 
     group_by(pic_name) %>% 
