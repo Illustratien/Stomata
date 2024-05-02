@@ -77,6 +77,99 @@ walk(1:length(folder_vec),function(foldid){
         mutate(id=1:n()) %>% 
         group_split()
       
+<<<<<<< HEAD
+    }
+  })
+)
+doParallel::stopImplicitCluster()
+
+# output directory ------------------------------------------------------------------
+dir.create(file.path("./result/check_ground_truth"), showWarnings = FALSE)
+tarfoldr <- file.path("./result/check_ground_truth",folder)
+dir.create(tarfoldr, showWarnings = FALSE)
+# dataframe export---------------------------------------------------------------
+
+dff<- map_depth(re,2,~{.x[[1]]}) %>% 
+  map(.,~{Reduce("rbind",.x)}) %>% 
+  imap(.,~{.x %>% mutate(source=sourcetype[.y])}) %>% 
+  Reduce("rbind",.)
+data.table::fwrite(dff,paste0(tarfoldr,"/",folder,"_check.csv"),row.names = F)
+message("\nremoved replicates:")
+setTxtProgressBar(pb,2)
+# -------------------------------------------------------------------------
+gmeg <- ground_df %>% 
+  select(-c(stomata.row,stomata.per.row,pic_width,pic_height,
+            display.y,type)) %>% 
+  rename(truth.class=class) 
+names(gmeg)<- gsub("(stomata\\.|boundingbox_)","truth.",names(gmeg))
+
+dff<- map_depth(re,2,~{.x[[3]]}) %>% 
+  map(.,~{Reduce("rbind",.x)}) %>% 
+  imap(.,~{.x %>%
+      mutate(source=sourcetype[.y]) %>% 
+      left_join(.,ntu_dlist[[.y]],
+                by=c("stomata.cx", "stomata.cy", "pic_name",
+                     "class","confidence"))
+  }) %>% 
+  Reduce("rbind",.) %>% 
+  dplyr::select(-type)%>% 
+  rename(detect.class=class)
+names(dff)<- gsub("(stomata\\.|boundingbox_)","detect.",names(dff))
+out <- dff%>% 
+  mutate(detect.area=detect.width*detect.height)  %>% 
+  full_join(.,gmeg%>% 
+              mutate(truth.area=truth.width*truth.height),c("pic_name", "truth.cx","truth.cy")) %>% 
+  relocate(source,pic_name,detect.width,detect.height,detect.area)
+
+data.table::fwrite(out,
+                   paste0(tarfoldr,"/",folder,"_detect.csv"),row.names = F)
+
+# -------------------------------------------------------------------------
+colv <- c(names(out)[grepl("(width|height)",names(out))],"pic_name","truth.class","source","confidence","detect.class")
+
+longdf <- out %>% select(all_of(colv)) %>% mutate(id=1:n()) %>% 
+  tidyr::pivot_longer(
+    -c(id,pic_name,truth.class,source,confidence,detect.class),
+    names_to = c("Var", ".value"), 
+    names_sep="\\." ) %>% 
+  tidyr::pivot_longer(width:height,names_to="trait",
+                      values_to = "Trait") %>% 
+  tidyr::pivot_wider(values_from = Trait,names_from = Var) 
+
+longdf%>% filter(truth.class=="complete") %>% 
+  ggplot(aes(detect,truth))+
+  geom_point(shape=1,aes(color=confidence))+
+  scale_color_viridis_c()+
+  geom_abline(intercept = 0,slope=1)+
+  scale_x_continuous(limits = c(0,200))+
+  scale_y_continuous(limits = c(0,200))+
+  facet_grid(trait~source)+theme_phd_facet()+
+  stat_poly_line(color="darkred",se=F) +
+  stat_poly_eq(use_label(c("eq", "R2")))+
+  ggtitle("complete ground truth")
+
+longdf%>% filter(detect.class=="complete") %>% 
+  ggplot(aes(detect,truth))+
+  geom_point(shape=1,aes(color=confidence))+
+  scale_color_viridis_c()+
+  geom_abline(intercept = 0,slope=1)+
+  scale_x_continuous(limits = c(0,200))+
+  scale_y_continuous(limits = c(0,200))+
+  facet_grid(trait~source)+theme_phd_facet()+
+  stat_poly_line(color="darkred",se=F) +
+  stat_poly_eq(use_label(c("eq", "R2")))+
+  ggtitle("complete detect truth")
+
+
+# plot --------------------------------------------------------------------
+message("\nexport pdf:")
+setTxtProgressBar(pb,3)
+plot_res<- map_depth(re,2,~{.x[[2]]})
+names(plot_res) <- sourcetype
+
+for(k in 1:2){
+  pdf(paste0(tarfoldr,"/",folder,"_",sourcetype[k],"_check.pdf"),
+=======
       res <- foreach(
         i  = 1:length(mdf),
         .packages = c("dplyr","purrr","ggplot2","tidyr","gridExtra")
@@ -177,6 +270,7 @@ walk(1:length(folder_vec),function(foldid){
   
   
   pdf(paste0(tarfoldr,"/",folder,"_",sourcetype[foldid],"_check.pdf"),
+>>>>>>> 419c87209a4cf1ac9687af21aed34664a0a4e540
       width=10,height=4,
       onefile = T)
   
