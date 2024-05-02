@@ -1,0 +1,8 @@
+conda create --name stomaenv python=3.10.0 jupyter pandas
+conda activate stomaenv
+conda install conda-forge::ultralytics
+conda install anaconda::dill
+##optional: when you have GPU
+#conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+#conda install nvidia/label/cuda-12.1.0::cuda
+
