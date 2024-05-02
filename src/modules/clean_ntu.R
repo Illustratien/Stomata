@@ -9,7 +9,8 @@
 # list.files("result/Ntu")#"result/Ntu_no_truth"
 rm(list = ls())
 source("src/modules/match_pipeline_fun.R")
-ntu_file <- list.files("result/Ntu_no_truth",pattern="*.csv")
+pacman::p_load(purrr,dplyr,foreach)
+ntu_file <- list.files("result/Ntu",pattern="*.csv")
 sourcetype <- ntu_file %>% strsplit("_") %>% 
   map_depth(.,1,~{.x[2]}) %>% unlist() %>% gsub(".csv","",.)
 names(ntu_file) <- sourcetype
@@ -43,10 +44,14 @@ ntu_merge <- imap_dfr(ntu_file,~{
   
   names(res)<- gsub("(stomata\\.|boundingbox_)","detect.",names(res))
   
-  res %>% mutate(detect.area=detect.width*detect.height) %>% 
-    relocate(source,pic_name,detect.width,detect.height,detect.area)
+  res %>%
+    rename(detect.length=detect.height) %>% 
+    mutate(
+      across(c(detect.width,detect.length),function(x){x*0.4}), #from pixel to microm
+      detect.area=detect.width*detect.length) %>%  
+    relocate(source,pic_name,detect.width,detect.length,detect.area)
   
 })
 doParallel::stopImplicitCluster()
 
-saveRDS(ntu_merge,file ="result/Ntu_no_truth/detect_merge.RDS" ,compress = T)
+saveRDS(ntu_merge,file ="result/Ntu/detect_merge.RDS" ,compress = T)
