@@ -1,14 +1,38 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Stomata detection
+# NTU automatic stomata image detection in python
+
+- [install
+  miniconda](https://docs.anaconda.com/free/miniconda/miniconda-install/)
+
+- [install visual code studio](https://code.visualstudio.com/download)
+
+- open `miniconda`, create conda virtual environment `stomaenv`
+
+``` r
+conda create --name stomaenv python=3.10.0 jupyter pandas
+conda activate stomaenv
+conda install conda-forge::ultralytics
+conda install anaconda::dill
+##optional: when you have GPU
+#conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+#conda install nvidia/label/cuda-12.1.0::cuda
+```
+
+- open `NTU_detect.ipynb` with `visual code studio`, select virtual
+  environment `stomaenv`
+- run all the cell, select the folder where you store your stomata
+  images, results would be generated in the folder `runs`
+
+# Manual image labelling & comparison with detection in R
 
 ## preparation
 
 please clone this repository to your local directory.
 
-1.  open Stomata.RProj
-2.  open run.R in folder “src”
+1.  open `Stomata.RProj`
+2.  open `run.R` in folder “`src`”
 3.  run
     [`set_up.R`](https://github.com/Illustratien/Stomata/blob/main/src/modules/set_up.R)
     to install necessary packages.
@@ -16,7 +40,7 @@ please clone this repository to your local directory.
 5.  put the folders contain .xml files under folder “data”, each folder
     would be one batch, for eaxmple: “T16L600”.
 
-## read ground truth
+## read ground truth (manual labelling)
 
 6.  run
     [`read_xml.R`](https://github.com/Illustratien/Stomata/blob/main/src/modules/read_xml.R)
@@ -30,7 +54,7 @@ please clone this repository to your local directory.
     [`summarize_and_merge.R`](https://github.com/Illustratien/Stomata/blob/main/src/modules/summarize_and_merge.R)
     line 23-25 to generate summarize statistics for each picture.
 
-## after`NTU`pipeline detection
+## Quality control of `NTU` automatic stomata image detection
 
 To tackle the issues of same detected position of a stomata have
 different class from the `NTU` pipeline.
@@ -57,7 +81,7 @@ For those picture that is both manually labelled and detected by the
 - note that only picture with the same picture name as ground truth when
   the detected stomata center is 3.2 microm to the ground truth.
 
-## Pull request
+# Pull request
 
 Want to contribute to the code? Very welcome!
 
@@ -67,7 +91,7 @@ Want to contribute to the code? Very welcome!
 4.  move it to the original folder and overwrite
 5.  make a pull request
 
-## ❓ Issues/Problems/Errors
+# ❓ Issues/Problems/Errors
 
 Please raise your question in
 [Issues](https://github.com/HU-IGPS/Photosynthesis-Yichen-Model/issues)

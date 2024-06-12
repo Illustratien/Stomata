@@ -7,3 +7,6 @@ result
 src/test
 doc
 StomataDetect/runs
+StomataDetect/Images
+StomataDetect/.idea
+runs
