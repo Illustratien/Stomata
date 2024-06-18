@@ -20,7 +20,7 @@ conda install anaconda::dill
 #conda install nvidia/label/cuda-12.1.0::cuda
 ```
 
-- open `NTU_detect.ipynb` with `visual code studio`, select virtual
+- open `NTU_detect_v8.ipynb` with `visual code studio`, select virtual
   environment `stomaenv`
 - run all the cell, select the folder where you store your stomata
   images, results would be generated in the folder `runs`

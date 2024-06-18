@@ -25,7 +25,7 @@ conda install anaconda::dill
 
 ```
 
-* open `NTU_detect.ipynb` with `visual code studio`, select virtual environment `stomaenv`
+* open `NTU_detect_v8.ipynb` with `visual code studio`, select virtual environment `stomaenv`
 * run all the cell, select the folder where you store your stomata images, results would be generated in the folder `runs`
 
 # Manual image labelling & comparison with detection in R

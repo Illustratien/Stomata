@@ -1,6 +1,7 @@
 pkg.list <- 
   c("XML","purrr", "ggforce",  
     "dplyr", "moments",'Rdpack','remotes','vctrs',
+    "gridExtra","cowplot","data.table","ggpmisc","ggrepl",
     # "ROI.plugin.glpk","ompr.roi","ompr", 
     "rlang" ,"tidyr", "pacman" ,  "ggbeeswarm","sma",
     "parallel","doParallel","broom")
