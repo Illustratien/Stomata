@@ -32,13 +32,20 @@ conda install anaconda::dill
 please clone this repository to your local directory.
 
 1.  open `Stomata.RProj`
+
 2.  open `run.R` in folder “`src`”
+
 3.  run
     [`set_up.R`](https://github.com/Illustratien/Stomata/blob/main/src/modules/set_up.R)
     to install necessary packages.
+
 4.  create folder for data and results from line 6-7.
-5.  put the folders contain .xml files under folder “data”, each folder
-    would be one batch, for eaxmple: “T16L600”.
+
+5.  put the **folders** contain .xml files under folder “data”, each
+    folder would be one batch, for example: “T16L600”.
+
+    ***!!! .xml files can’t directly put in data, your need to put them
+    under a folder inside data!!!***
 
 ## read ground truth (manual labelling)
 
