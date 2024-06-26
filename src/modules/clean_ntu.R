@@ -38,7 +38,7 @@ ntu_merge <- imap_dfr(ntu_file,~{
     Reduce("bind_rows",.) %>% 
     # recover the unit of bounding box length to pixel 
     mutate(
-      source=.y,
+      # source=.y,
       across(ends_with(c("x", "width")),~.x*2592),
       across(ends_with(c("y", "height")),~.x*1944))
   
@@ -49,7 +49,7 @@ ntu_merge <- imap_dfr(ntu_file,~{
     mutate(
       across(c(detect.width,detect.length),function(x){x*0.4}), #from pixel to microm
       detect.area=detect.width*detect.length) %>%  
-    relocate(source,pic_name,detect.width,detect.length,detect.area)
+    relocate(pic_name,detect.width,detect.length,detect.area)
   
 })
 doParallel::stopImplicitCluster()
