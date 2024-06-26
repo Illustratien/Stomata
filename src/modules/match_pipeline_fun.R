@@ -11,7 +11,7 @@ plotfun <- function(df,disthresh=80){
   # match each point to ground truth
   ntd<- map_dfr(1:nrow(ndf),~{
     # for each point in estimated pipeline
-    # bind witn ground truth and calculate the distance
+    # bind with ground truth and calculate the distance
     d <- bind_rows(ndf[.x,],
                    gdf) %>% 
       dplyr::select(stomata.cx,stomata.cy) %>% 
