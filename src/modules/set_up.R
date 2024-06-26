@@ -1,9 +1,9 @@
 pkg.list <- 
-  c("XML","purrr", "ggforce",  
+  c("XML","purrr", "ggforce", 
     "dplyr", "moments",'Rdpack','remotes','vctrs',
     "gridExtra","cowplot","data.table","ggpmisc","ggrepl",
     # "ROI.plugin.glpk","ompr.roi","ompr", 
-    "rlang" ,"tidyr", "pacman" ,  "ggbeeswarm","sma",
+    "rlang" ,"tidyr", "pacman" ,  "ggbeeswarm","smatr",
     "parallel","doParallel","broom")
 local.pkg <- installed.packages()[,"Package"]
 new.packages <- pkg.list[!(pkg.list %in% local.pkg)]
