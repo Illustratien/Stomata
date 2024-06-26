@@ -12,9 +12,11 @@
 
 ``` r
 conda create --name stomaenv python=3.10.0 jupyter pandas
+# after the first line has done
 conda activate stomaenv
 conda install conda-forge::ultralytics
 conda install anaconda::dill
+conda install anaconda::ipykernel
 ##optional: when you have GPU
 #conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 #conda install nvidia/label/cuda-12.1.0::cuda
@@ -33,19 +35,24 @@ please clone this repository to your local directory.
 
 1.  open `Stomata.RProj`
 
-2.  open `run.R` in folder “`src`”
+2.  open
+    [`run.R`](https://github.com/Illustratien/Stomata/blob/main/src/run.R)
+    in folder “`src`”
 
 3.  run
     [`set_up.R`](https://github.com/Illustratien/Stomata/blob/main/src/modules/set_up.R)
     to install necessary packages.
 
-4.  create folder for data and results from line 6-7.
+4.  create two folders named `data` and `results` from line 6-7.
 
-5.  put the **folders** contain .xml files under folder “data”, each
-    folder would be one batch, for example: “T16L600”.
+5.  create **sub-folder(s)** under directory **“data”**
+    (`data/sub-folder`)
 
-    ***!!! .xml files can’t directly put in data, your need to put them
-    under a folder inside data!!!***
+    For example: folder `data/T16L600` contains all `.xml` files from
+    experiment T16L600.
+
+    ***!!! .xml files can’t directly put in `data`, your need to put
+    them under a folder inside `data`!!!***
 
 ## read ground truth (manual labelling)
 

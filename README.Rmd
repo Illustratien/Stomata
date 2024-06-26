@@ -5,8 +5,6 @@ always_allow_html: true
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-
-
 # NTU automatic stomata image detection in python
 
 * [install miniconda](https://docs.anaconda.com/free/miniconda/miniconda-install/)
@@ -16,9 +14,11 @@ always_allow_html: true
 
 ```{r, eval=FALSE}
 conda create --name stomaenv python=3.10.0 jupyter pandas
+# after the first line has done
 conda activate stomaenv
 conda install conda-forge::ultralytics
 conda install anaconda::dill
+conda install anaconda::ipykernel
 ##optional: when you have GPU
 #conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 #conda install nvidia/label/cuda-12.1.0::cuda
@@ -35,19 +35,19 @@ conda install anaconda::dill
 please clone this repository to your local directory.
 
 1. open `Stomata.RProj`
-2. open `run.R` in folder "`src`"
+2. open [`run.R`](https://github.com/Illustratien/Stomata/blob/main/src/run.R) in folder "`src`"
 3. run [`set_up.R`](https://github.com/Illustratien/Stomata/blob/main/src/modules/set_up.R) to install necessary packages.
-4. create folder for data and results from line 6-7.
-5. put the **folders** contain .xml files under folder "data", 
-   each folder would be one batch, for example: "T16L600".
+4. create two folders named `data` and `results` from line 6-7.
+5. create **sub-folder(s)** under directory **"data"** (`data/sub-folder`) 
    
-   ***!!! .xml files can't directly put in data, your need to put them under a folder inside data!!!***
+   For example: folder `data/T16L600` contains all `.xml` files from experiment T16L600. 
+   
+   ***!!! .xml files can't directly put in `data`, your need to put them under a folder inside `data`!!!***
    
 ## read ground truth (manual labelling)
 6. run [`read_xml.R`](https://github.com/Illustratien/Stomata/blob/main/src/modules/read_xml.R) from line 11-13 to read the files and generate basic results for each batch
 7. run [`stat_analysis.R`](https://github.com/Illustratien/Stomata/blob/main/src/modules/stat_analysis.R) line 18-20 to read the files and generate statistics for each stomata rows.
 8. run [`summarize_and_merge.R`](https://github.com/Illustratien/Stomata/blob/main/src/modules/summarize_and_merge.R) line 23-25 to generate summarize statistics for each picture.
-
 
 
 ## Quality control of `NTU` automatic stomata image detection
@@ -88,18 +88,11 @@ Please raise your question in [Issues](https://github.com/HU-IGPS/Photosynthesis
 
 2. Describe the issue/problem/error clearly.
 
-For example, to describe there is a issue of an unexpected mismatch picture names from `clean_ntu.R`. 
-
-| |input | output |script|
-|-------|------|------|----------|
-| format |res_noblurry.csv |detect_merge.RDS| clean_ntu.R|
-| size |5760 |480| clean_ntu.R|
-
-
-3. identify the error: Is it an error? (Do you recieved error message?)
+3. identify the error: Is it an error? (Do you received error message?)
   * If yes, Which code, which line, which error
   * If it is inside a loop, can you identify the index inside the loop?
   * see here more for [debug](https://ericlippert.com/2014/03/05/how-to-debug-small-programs/)
+  
 4. Interpretation of the message: `Google` the error/ `Chatgpt` 
 5. Reproduce the error: make sure it is [reproducible](https://stackoverflow.com/help/minimal-reproducible-example)
 6. Post on github/slack for help
