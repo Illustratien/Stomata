@@ -95,7 +95,7 @@ walk(1:length(folder_vec),function(foldid){
   
   dff<- map_depth(re,2,~{.x[[1]]}) %>% 
     map(.,~{Reduce("rbind",.x)}) %>% 
-    imap(.,~{.x %>% mutate(source=sourcetype[.y])}) %>% 
+    # imap(.,~{.x %>% mutate(source=sourcetype[.y])}) %>% 
     Reduce("rbind",.)
   data.table::fwrite(dff,paste0(tarfoldr,"/",folder,"_check.csv"),row.names = F)
   message("\nremoved replicates:")
@@ -110,7 +110,7 @@ walk(1:length(folder_vec),function(foldid){
   dff<- map_depth(re,2,~{.x[[3]]}) %>% 
     map(.,~{Reduce("rbind",.x)}) %>% 
     imap(.,~{.x %>%
-        mutate(source=sourcetype[foldid]) %>% 
+        # mutate(source=sourcetype[foldid]) %>% 
         left_join(.,ntu_dlist,
                   by=c("stomata.cx", "stomata.cy", "pic_name",
                        "class","confidence"))
@@ -126,17 +126,17 @@ walk(1:length(folder_vec),function(foldid){
     left_join(.,gmeg%>% 
                 mutate(across(ends_with("length") | ends_with("width"),function(x){x*0.4}), #from pixel to microm               
                        truth.area=truth.width*truth.length),c("pic_name", "truth.cx","truth.cy")) %>% 
-    relocate(source,pic_name,detect.width,detect.length,detect.area)
+    relocate(pic_name,detect.width,detect.length,detect.area)
   
   data.table::fwrite(out,
                      paste0(tarfoldr,"/",folder,"_detect.csv"),row.names = F)
   
   # -------------------------------------------------------------------------
-  colv <- c(names(out)[grepl("(width|length)",names(out))],"pic_name","truth.class","source","confidence","detect.class")
+  colv <- c(names(out)[grepl("(width|length)",names(out))],"pic_name","truth.class","confidence","detect.class")
   
   longdf <- out %>% select(all_of(colv)) %>% mutate(id=1:n()) %>% 
     tidyr::pivot_longer(
-      -c(id,pic_name,truth.class,source,confidence,detect.class),
+      -c(id,pic_name,truth.class,confidence,detect.class),
       names_to = c("Var", ".value"), 
       names_sep="\\." ) %>% 
     tidyr::pivot_longer(width:length,names_to="trait",
@@ -150,7 +150,7 @@ walk(1:length(folder_vec),function(foldid){
     geom_abline(intercept = 0,slope=1)+
     scale_x_continuous(limits = c(0,200))+
     scale_y_continuous(limits = c(0,200))+
-    facet_grid(trait~source)+theme_test()+
+    facet_grid(trait~.)+theme_test()+
     stat_poly_line(color="darkred",se=F) +
     stat_poly_eq(use_label(c("eq", "R2")))+
     ggtitle("complete ground truth")
@@ -162,7 +162,7 @@ walk(1:length(folder_vec),function(foldid){
     geom_abline(intercept = 0,slope=1)+
     scale_x_continuous(limits = c(0,200))+
     scale_y_continuous(limits = c(0,200))+
-    facet_grid(trait~source)+theme_test()+
+    facet_grid(trait~.)+theme_test()+
     stat_poly_line(color="darkred",se=F) +
     stat_poly_eq(use_label(c("eq", "R2")))+
     ggtitle("complete detect truth")
@@ -175,7 +175,7 @@ walk(1:length(folder_vec),function(foldid){
   names(plot_res) <- sourcetype[foldid]
   
   
-  pdf(paste0(tarfoldr,"/",folder,"_",sourcetype[foldid],"_check.pdf"),
+  pdf(paste0(tarfoldr,"/",folder,"_check.pdf"),
       
       width=10,height=4,
       onefile = T)
