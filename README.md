@@ -95,6 +95,13 @@ For those picture that is both manually labelled and detected by the
 - note that only picture with the same picture name as ground truth when
   the detected stomata center is 3.2 microm to the ground truth.
 
+# unit and names of stomata object
+
+<figure>
+<img src="%22pic/Stomata%20object.png%22" alt="Stomata" />
+<figcaption aria-hidden="true">Stomata</figcaption>
+</figure>
+
 # Pull request
 
 Want to contribute to the code? Very welcome!
@@ -118,15 +125,7 @@ and set a request in
 
 2.  Describe the issue/problem/error clearly.
 
-For example, to describe there is a issue of an unexpected mismatch
-picture names from `clean_ntu.R`.
-
-|        | input            | output           | script      |
-|--------|------------------|------------------|-------------|
-| format | res_noblurry.csv | detect_merge.RDS | clean_ntu.R |
-| size   | 5760             | 480              | clean_ntu.R |
-
-3.  identify the error: Is it an error? (Do you recieved error message?)
+3.  identify the error: Is it an error? (Do you received error message?)
 
 - If yes, Which code, which line, which error
 - If it is inside a loop, can you identify the index inside the loop?
