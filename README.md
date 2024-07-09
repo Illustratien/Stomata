@@ -98,7 +98,7 @@ For those picture that is both manually labelled and detected by the
 # unit and names of stomata object
 
 <figure>
-<img src="%22pic/Stomata%20object.png%22" alt="Stomata" />
+<img src="pic/Stomata_object.png" alt="Stomata" />
 <figcaption aria-hidden="true">Stomata</figcaption>
 </figure>
 

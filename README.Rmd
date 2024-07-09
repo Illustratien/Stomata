@@ -68,7 +68,7 @@ For those picture that is both manually labelled and detected by the `NTU`
 * note that only picture with the same picture name as ground truth when the detected stomata center is 3.2 microm to the ground truth. 
 
 # unit and names of stomata object
-![Stomata]("pic/Stomata object.png")
+![Stomata](pic/Stomata_object.png)
 
 # Pull request
 Want to contribute to the code? Very welcome!
